@@ -1,0 +1,571 @@
+
+<!DOCTYPE html>
+<html lang="zh-cn">
+    
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="generator" content="BulldogX&#39;s Notes">
+    <title>ReactNative与iOS的交互 - BulldogX&#39;s Notes</title>
+    <meta name="author" content="BulldogX">
+    
+    
+    
+    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"BulldogX","sameAs":[],"image":"/Avatar_icefrog.jpg"},"articleBody":"1.1 RCTRootView初始化问题123456789101112131415161718/** * - Designated initializer - */- (instancetype)initWithBridge:(RCTBridge *)bridge                    moduleName:(NSString *)moduleName             initialProperties:(NSDictionary *)initialProperties NS_DESIGNATED_INITIALIZER;/** * - Convenience initializer - * A bridge will be created internally. * This initializer is intended to be used when the app has a single RCTRootView, * otherwise create an `RCTBridge` and pass it in via `initWithBridge:moduleName:` * to all the instances. */- (instancetype)initWithBundleURL:(NSURL *)bundleURL                       moduleName:(NSString *)moduleName                initialProperties:(NSDictionary *)initialProperties                    launchOptions:(NSDictionary *)launchOptions;\n\n\n1、当Native APP内只有一处RN的入口时，可以使用initWithBundleURL，否则的话就要使用initWithBridge方法。2、因为initWithBundleURL会在内部创建一个RCTBridge，当有多个RCTRootView入口时，就会存在多个RCTBridge，容易导致Native端与RN交互时多次响应，出现BUG。\n\n1.2 创建自定义的RNBridgeManager\n由于APP内有RN多入口的需求，所以共用一个RCTBridge\n\nRNBridgeManager.h\n123456789101112131415#import &lt;Foundation/Foundation.h&gt;#import &lt;React/RCTBridge.h&gt;NS_ASSUME_NONNULL_BEGIN@interface RNBridgeManager : RCTBridge/** RNBridgeManager单例 */+ (instancetype)sharedManager;@endNS_ASSUME_NONNULL_END\nRNBridgeManager.m\n123456789101112131415161718192021222324252627282930313233343536373839#import &quot;RNBridgeManager.h&quot;#import &lt;React/RCTBundleURLProvider.h&gt;//dev模式下:RCTBridge required dispatch_sync to load RCTDevLoadingView Error Fix#if RCT_DEV#import &lt;React/RCTDevLoadingView.h&gt;#endif/** 自定义类，实现RCTBridgeDelegate */@interface BridgeHandle : NSObject&lt;RCTBridgeDelegate&gt;@end@implementation BridgeHandle- (NSURL *)sourceURLForBridge:(RCTBridge *)bridge&#123;    return [[RCTBundleURLProvider sharedSettings] jsBundleURLForBundleRoot:@&quot;index&quot; fallbackResource:nil];&#125;@end@implementation RNBridgeManager+ (instancetype)sharedManager&#123;    static RNBridgeManager *manager;    static dispatch_once_t onceToken;    dispatch_once(&amp;onceToken, ^&#123;        manager = [[RNBridgeManager alloc] initWithDelegate:[[BridgeHandle alloc] init] launchOptions:nil];#if RCT_DEV        [manager moduleForClass:[RCTDevLoadingView class]];#endif    &#125;);     return manager;&#125;@end\n1.3 Native进入RN页面1234RCTRootView *rootView = [[RCTRootView alloc] initWithBridge:[RNBridgeManager sharedManager] moduleName:@&quot;RNTest&quot; initialProperties:nil];UIViewController *vc = [[UIViewController alloc] init];vc.view = rootView;[self.navigationController pushViewController:vc animated:YES];\n1.4 RN调用Native方法\n创建一个交互的类，实现&lt;RCTBridgeModule&gt;协议；\n固定格式：在.m的实现中，首先导出模块名字RCT_EXPORT_MODULE();，RCT_EXPORT_MODULE接受字符串作为其Module的名称，如果不设置名称的话默认就使用类名作为Modul的名称；\n使用RCT_EXPORT_METHOD导出Native的方法；\n\n1.4.1 比如我们导出Native端的SVProgressHUD提示方法：RNInterractModule.h\n12345678910#import &lt;Foundation/Foundation.h&gt;#import &lt;React/RCTBridgeModule.h&gt;NS_ASSUME_NONNULL_BEGIN@interface RNInterractModule : NSObject&lt;RCTBridgeModule&gt;@endNS_ASSUME_NONNULL_END\nRNInterractModule.m\n123456789101112131415import &quot;RNInterractModule.h&quot;#import &quot;Util.h&quot;#import &lt;SVProgressHUD.h&gt;@implementation RNInterractModule////RCT_EXPORT_MODULE接受字符串作为其Module的名称，如果不设置名称的话默认就使用类名作为Modul的名称RCT_EXPORT_MODULE();//==============1、提示==============RCT_EXPORT_METHOD(showInfo:(NSString *) info)&#123;    dispatch_sync(dispatch_get_main_queue(), ^&#123;        [SVProgressHUD showInfoWithStatus:info];    &#125;);&#125;@end\n1.4.2 RN端调用导出的showInfo方法：我们在RN端把Native的方法通过一个共同的utils工具类引入，如下\n12345import &#123; NativeModules &#125; from 'react-native';//导出Native端的方法export const &#123; showInfo&#125; = NativeModules.RNInterractModule;\n具体的RN页面使用时：\n1234567import &#123; showInfo &#125; from \"../utils\";//通过Button点击事件触发&lt;Button\ttitle='1、调用Native提示'\tonPress=&#123;() =&gt; showInfo('我是原生端的提示！')&#125;/&gt;\n调用效果：\n1.4.3 RN回调Native\nRN文档显示，目前iOS端的回调还处于实验阶段\n\n我们提供一个例子来模拟：目前的需求是做面包，RN端能提供面粉，但是不会做，Native端是有做面包的功能；所以我们需要先把面粉，传给Native端，Native加工好面包之后，再通过回调回传给RN端。\nNative端提供方法\n12345678910111213141516171819202122// 比如调用原生的方法处理图片、视频之类的，处理完成之后再把结果回传到RN页面里去//TODO（RN文档显示，目前iOS端的回调还处于实验阶段）RCT_EXPORT_METHOD(patCake:(NSString *)flour successBlock:(RCTResponseSenderBlock)successBlock errorBlock:(RCTResponseErrorBlock)errorBlock)&#123;    __weak __typeof(self)weakSelf = self;    dispatch_sync(dispatch_get_main_queue(), ^&#123;        NSString *cake = [weakSelf patCake:flour];        //模拟成功、失败的block判断        if([flour isKindOfClass:[NSString class]])&#123;            successBlock(@[@[cake]]);//此处参数需要放在数组里面        &#125;else&#123;            NSError *error = [NSError errorWithDomain:@&quot;com.RNTest&quot; code:-1 userInfo:@&#123;@&quot;message&quot;:@&quot;类型不匹配&quot;&#125;];            errorBlock(error);        &#125;    &#125;);&#125;//使用RN端传递的参数字符串：&quot;&quot;，调用Native端的做面包方法，加工成面包，再回传给RN- (NSString *)patCake:(NSString *)flour&#123;    NSString * cake = [NSString stringWithFormat:@&quot;使用%@，做好了：🎂🍞🍞🍰🍰🍰&quot;,flour];    return cake;&#125;\nRN端调用：\n1234567891011//首先工具类里先引入export const &#123; showInfo,patCake &#125; = NativeModules.RNInterractModule;//具体页面使用&lt;Button\ttitle='4、回调：使用面粉做蛋糕'\tonPress=&#123;() =&gt; patCake('1斤面粉',\t\t(cake) =&gt; alert(cake),\t\t(error) =&gt; alert('出错了' + error.message))&#125;\t/&gt;\n调用效果：\n\n1.4.4 使用Promise回调Native端提供方法\n12345678910111213141516RCT_EXPORT_METHOD(callNameTointroduction:(NSString *)name resolver:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock) reject)&#123;    __weak __typeof(self)weakSelf = self;    dispatch_sync(dispatch_get_main_queue(), ^&#123;        if ([name isKindOfClass:NSString.class]) &#123;            resolve([weakSelf introduction:name]);        &#125;else&#123;            NSError *error = [NSError errorWithDomain:@&quot;com.RNTest&quot; code:-1 userInfo:@&#123;@&quot;message&quot;:@&quot;类型不匹配&quot;&#125;];            reject(@&quot;class_error&quot;,@&quot;Needs NSString Class&quot;,error);        &#125;    &#125;);&#125;- (NSString *)introduction:(NSString *)name&#123;    return [NSString stringWithFormat:@&quot;我的名字叫%@，今年18岁，喜欢运动、听歌...&quot;,name];&#125;\nRN端调用：\n1234567891011121314151617//首先工具类里先引入export const &#123; showInfo,patCake, callNameTointroduction&#125; = NativeModules.RNInterractModule;//具体页面使用&lt;Button\ttitle='5、Promise：点名自我介绍'\tonPress=&#123;\t\tasync () =&gt; &#123;\t\t\ttry &#123;\t\t\t\tlet introduction = await callNameTointroduction('小明');\t\t\t\tshowInfo(introduction);\t\t\t&#125; catch (e) &#123;\t\t\t\talert(e.message);\t\t\t&#125;\t\t&#125;\t&#125;/&gt;\n调用效果：\n1.5 Native端发送通知到RNNative端继承RCTEventEmitter,实现发送RN通知类：\nRNNotificationManager.h\n1234567891011121314#import &lt;Foundation/Foundation.h&gt;#import &lt;React/RCTEventEmitter.h&gt;#import &lt;React/RCTBridgeModule.h&gt;NS_ASSUME_NONNULL_BEGIN@interface RNNotificationManager : RCTEventEmitter+ (instancetype)sharedManager;@endNS_ASSUME_NONNULL_END\nRNNotificationManager.m\n123456789101112131415161718192021222324252627282930313233343536373839404142434445464748495051525354555657585960616263646566676869#import &quot;RNNotificationManager.h&quot;@implementation RNNotificationManager&#123;    BOOL hasListeners;&#125;+ (instancetype)sharedManager&#123;    static RNNotificationManager *manager;    static dispatch_once_t onceToken;    dispatch_once(&amp;onceToken,^&#123;        manager = [[self alloc] init];    &#125;);    return manager;&#125;- (instancetype)init&#123;    self = [super init];    if (self) &#123;        NSNotificationCenter *center = [NSNotificationCenter defaultCenter];        [center removeObserver:self];        [center addObserver:self selector:@selector(handleEventNotification:) name:@&quot;kRNNotification_Login&quot; object:nil];        [center addObserver:self selector:@selector(handleEventNotification:) name:@&quot;kRNNotification_Logout&quot; object:nil];    &#125;;    return self;&#125;RCT_EXPORT_MODULE()- (NSArray&lt;NSString *&gt; *)supportedEvents&#123;    return @[             @&quot;kRNNotification_Login&quot;,             @&quot;kRNNotification_Logout&quot;             ];&#125;//优化无监听处理的事件//在添加第一个监听函数时触发- (void)startObserving&#123;    //setup any upstream listenerse or background tasks as necessary    hasListeners = YES;    NSLog(@&quot;-----------&gt;startObserving&quot;);&#125;//will be called when this mdules&apos;s last listener is removed,or on dealloc.- (void)stopObserving&#123;    //remove upstream listeners,stop unnecessary background tasks.    hasListeners = NO;    NSLog(@&quot;-----------&gt;stopObserving&quot;);&#125;+ (BOOL)requiresMainQueueSetup&#123;    return YES;&#125;- (void)handleEventNotification:(NSNotification *)notification&#123;    if (!hasListeners) &#123;        return;    &#125;        NSString *name = notification.name;    NSLog(@&quot;通知名字--------&gt;%@&quot;,name);    [self sendEventWithName:name body:notification.userInfo];    &#125;@end\nRN端注册监听：\n12345678910111213141516171819202122232425262728293031323334353637383940414243//utils工具类中导出export const NativeEmitterModuleIOS = new NativeEventEmitter(NativeModules.RNNotificationManager);//具体页面使用import &#123; NativeEmitterModuleIOS &#125; from \"../utils\";export default class ActivityScene extends Component &#123;\tconstructor(props) &#123;\t\tsuper(props);\t\tthis.subscription = null;\t\tthis.state = &#123;\t\t\tloginInfo: '当前未登录',\t\t&#125;;\t&#125;\tupdateLoginInfoText = (reminder) =&gt; &#123;\t\tthis.setState(&#123;loginInfo: reminder.message&#125;)\t&#125;;\t//添加监听\tcomponentWillMount() &#123;\t\tthis.subscription = NativeEmitterModuleIOS.addListener('kRNNotification_Login', this.updateLoginInfoText);\t\t\t&#125;\t//移除监听\tcomponentWillUnmount() &#123;\t\t\tconsole.log('ActivityScene---------&gt;', '移除通知');\t\t\tthis.subscription.remove();\t&#125;\trender() &#123;\t\treturn (\t\t\t&lt;View style=&#123;&#123;flex: 1, backgroundColor: 'white'&#125;&#125;&gt;\t\t\t\t&lt;Button\t\t\t\t\ttitle='3、RN Push到Native 发送通知页面'\t\t\t\t\tonPress=&#123;() =&gt; pushNative(RNEmitter)&#125;\t\t\t\t/&gt;\t\t\t\t&lt;Text style=&#123;&#123;fontSize: 20, color: 'red', textAlign: 'center',marginTop:50&#125;&#125;&gt;&#123;this.state.loginInfo&#125;&lt;/Text&gt;\t\t\t&lt;/View&gt;\t\t);\t&#125;&#125;\n效果展示：\n\n1.6 完整Demo（包含iOS &amp; Android)RN-NativeTest\n","dateCreated":"2018-12-20T15:32:06+08:00","dateModified":"2018-12-20T17:07:25+08:00","datePublished":"2018-12-20T15:32:06+08:00","description":"1.1 RCTRootView初始化问题123456789101112131415161718/** * - Designated initializer - */- (instancetype)initWithBridge:(RCTBridge *)bridge                    moduleName:(NSString *)moduleName             initialProperties:(NSDictionary *)initialProperties NS_DESIGNATED_INITIALIZER;/** * - Convenience initializer - * A bridge will be created internally. * This initializer is intended to be used when the app has a single RCTRootView, * otherwise create an `RCTBridge` and pass it in via `initWithBridge:moduleName:` * to all the instances. */- (instancetype)initWithBundleURL:(NSURL *)bundleURL                       moduleName:(NSString *)moduleName                initialProperties:(NSDictionary *)initialProperties                    launchOptions:(NSDictionary *)launchOptions;","headline":"ReactNative与iOS的交互","image":[],"mainEntityOfPage":{"@type":"WebPage","@id":"http://yoursite.com/2018/12/20/ReactNative/ReactNative与iOS的交互/"},"publisher":{"@type":"Organization","name":"BulldogX","sameAs":[],"image":"/Avatar_icefrog.jpg","logo":{"@type":"ImageObject","url":"/Avatar_icefrog.jpg"}},"url":"http://yoursite.com/2018/12/20/ReactNative/ReactNative与iOS的交互/","keywords":"ReactNative"}</script>
+    <meta name="description" content="1.1 RCTRootView初始化问题123456789101112131415161718/** * - Designated initializer - */- (instancetype)initWithBridge:(RCTBridge *)bridge                    moduleName:(NSString *)moduleName             in">
+<meta name="keywords" content="ReactNative">
+<meta property="og:type" content="blog">
+<meta property="og:title" content="ReactNative与iOS的交互">
+<meta property="og:url" content="http://yoursite.com/2018/12/20/ReactNative/ReactNative与iOS的交互/index.html">
+<meta property="og:site_name" content="BulldogX&#39;s Notes">
+<meta property="og:description" content="1.1 RCTRootView初始化问题123456789101112131415161718/** * - Designated initializer - */- (instancetype)initWithBridge:(RCTBridge *)bridge                    moduleName:(NSString *)moduleName             in">
+<meta property="og:locale" content="zh-cn">
+<meta property="og:image" content="https://ws1.sinaimg.cn/large/72ebc0edgy1fybv53uebvg208z0idaac.gif">
+<meta property="og:image" content="https://ws1.sinaimg.cn/large/72ebc0edgy1fybvin9v20g208z0idq4j.gif">
+<meta property="og:image" content="https://wx3.sinaimg.cn/large/72ebc0edgy1fybvoha3crg208z0id3z1.gif">
+<meta property="og:image" content="https://ws1.sinaimg.cn/large/72ebc0edgy1fyd60aqb8bg208z0idabx.gif">
+<meta property="og:updated_time" content="2018-12-20T09:07:25.590Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="ReactNative与iOS的交互">
+<meta name="twitter:description" content="1.1 RCTRootView初始化问题123456789101112131415161718/** * - Designated initializer - */- (instancetype)initWithBridge:(RCTBridge *)bridge                    moduleName:(NSString *)moduleName             in">
+<meta name="twitter:image" content="https://ws1.sinaimg.cn/large/72ebc0edgy1fybv53uebvg208z0idaac.gif">
+    
+    
+        
+    
+    
+        <meta property="og:image" content="http://yoursite.com/assets/images/Avatar_icefrog.jpg"/>
+    
+    
+    
+    
+    <!--STYLES-->
+    <link rel="stylesheet" href="/assets/css/style-du2xmrqdqrl2ollgeiw050kpl6l4nbyz7bumjuurjgsxyopifvukebxc9lqe.min.css">
+    <!--STYLES END-->
+    
+
+    
+</head>
+
+    <body>
+        <div id="blog">
+            <!-- Define author's picture -->
+
+
+    
+        
+            
+        
+    
+
+<header id="header" data-behavior="2">
+    <i id="btn-open-sidebar" class="fa fa-lg fa-bars"></i>
+    <div class="header-title">
+        <a class="header-title-link" href="/ ">BulldogX&#39;s Notes</a>
+    </div>
+    
+        
+            <a  class="header-right-picture "
+                href="#about">
+        
+        
+            <img class="header-picture" src="/assets/images/Avatar_icefrog.jpg" alt="作者的图片"/>
+        
+        </a>
+    
+</header>
+
+            <!-- Define author's picture -->
+
+
+
+        
+    
+
+<nav id="sidebar" data-behavior="2">
+    <div class="sidebar-container">
+        
+            <div class="sidebar-profile">
+                <a href="/#about">
+                    <img class="sidebar-profile-picture" src="/assets/images/Avatar_icefrog.jpg" alt="作者的图片"/>
+                </a>
+                <h4 class="sidebar-profile-name">BulldogX</h4>
+                
+                    <h5 class="sidebar-profile-bio"><p style='color:red'>国家一级抬杠运动员</p></h5>
+                
+            </div>
+        
+        
+            <ul class="sidebar-buttons">
+            
+                <li class="sidebar-button">
+                    
+                        <a  class="sidebar-button-link "
+                             href="/ "
+                            
+                            title="首页"
+                        >
+                    
+                        <i class="sidebar-button-icon fa fa-home" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">首页</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a  class="sidebar-button-link "
+                             href="/all-categories"
+                            
+                            title="分类"
+                        >
+                    
+                        <i class="sidebar-button-icon fa fa-bookmark" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">分类</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a  class="sidebar-button-link "
+                             href="/all-tags"
+                            
+                            title="标签"
+                        >
+                    
+                        <i class="sidebar-button-icon fa fa-tags" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">标签</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a  class="sidebar-button-link "
+                             href="/all-archives"
+                            
+                            title="归档"
+                        >
+                    
+                        <i class="sidebar-button-icon fa fa-archive" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">归档</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a  class="sidebar-button-link open-algolia-search"
+                             href="#search"
+                            
+                            title="搜索"
+                        >
+                    
+                        <i class="sidebar-button-icon fa fa-search" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">搜索</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a  class="sidebar-button-link "
+                             href="#about"
+                            
+                            title="关于"
+                        >
+                    
+                        <i class="sidebar-button-icon fa fa-question" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">关于</span>
+                    </a>
+            </li>
+            
+        </ul>
+        
+            <ul class="sidebar-buttons">
+            
+        </ul>
+        
+    </div>
+</nav>
+
+            
+            <div id="main" data-behavior="2"
+                 class="
+                        hasCoverMetaIn
+                        ">
+                
+<article class="post">
+    
+    
+        <div class="post-header main-content-wrap text-left">
+    
+        <h1 class="post-title">
+            ReactNative与iOS的交互
+        </h1>
+    
+    
+        <div class="post-meta">
+    <time datetime="2018-12-20T15:32:06+08:00">
+	
+		    12月 20, 2018
+    	
+    </time>
+    
+        <span>发布在 </span>
+        
+    <a class="category-link" href="/categories/ReactNative/">ReactNative</a>
+
+
+    
+    <!--如果是文章页面则显示阅读统计>-->
+        
+        <span id="busuanzi_container_page_pv">
+         | 本文共被围观 <span id="busuanzi_value_page_pv"></span> 次.
+        </span>
+        
+</div>
+
+    
+</div>
+
+    
+    <div class="post-content markdown">
+        <div class="main-content-wrap">
+            <h3 id="1-1-RCTRootView初始化问题"><a href="#1-1-RCTRootView初始化问题" class="headerlink" title="1.1 RCTRootView初始化问题"></a>1.1 RCTRootView初始化问题</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">/**</span><br><span class="line"> * - Designated initializer -</span><br><span class="line"> */</span><br><span class="line">- (instancetype)initWithBridge:(RCTBridge *)bridge</span><br><span class="line">                    moduleName:(NSString *)moduleName</span><br><span class="line">             initialProperties:(NSDictionary *)initialProperties NS_DESIGNATED_INITIALIZER;</span><br><span class="line"></span><br><span class="line">/**</span><br><span class="line"> * - Convenience initializer -</span><br><span class="line"> * A bridge will be created internally.</span><br><span class="line"> * This initializer is intended to be used when the app has a single RCTRootView,</span><br><span class="line"> * otherwise create an `RCTBridge` and pass it in via `initWithBridge:moduleName:`</span><br><span class="line"> * to all the instances.</span><br><span class="line"> */</span><br><span class="line">- (instancetype)initWithBundleURL:(NSURL *)bundleURL</span><br><span class="line">                       moduleName:(NSString *)moduleName</span><br><span class="line">                initialProperties:(NSDictionary *)initialProperties</span><br><span class="line">                    launchOptions:(NSDictionary *)launchOptions;</span><br></pre></td></tr></table></figure>
+<a id="more"></a>
+<blockquote>
+<p>1、当Native APP内只有一处RN的入口时，可以使用<code>initWithBundleURL</code>，否则的话就要使用<code>initWithBridge</code>方法。<br>2、因为<code>initWithBundleURL</code>会在内部创建一个<code>RCTBridge</code>，当有多个<code>RCTRootView</code>入口时，就会存在多个<code>RCTBridge</code>，容易导致Native端与RN交互时多次响应，出现BUG。</p>
+</blockquote>
+<h3 id="1-2-创建自定义的RNBridgeManager"><a href="#1-2-创建自定义的RNBridgeManager" class="headerlink" title="1.2 创建自定义的RNBridgeManager"></a>1.2 创建自定义的<code>RNBridgeManager</code></h3><blockquote>
+<p>由于APP内有RN多入口的需求，所以共用一个<code>RCTBridge</code></p>
+</blockquote>
+<p><strong>RNBridgeManager.h</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">#import &lt;Foundation/Foundation.h&gt;</span><br><span class="line">#import &lt;React/RCTBridge.h&gt;</span><br><span class="line"></span><br><span class="line">NS_ASSUME_NONNULL_BEGIN</span><br><span class="line"></span><br><span class="line">@interface RNBridgeManager : RCTBridge</span><br><span class="line">/**</span><br><span class="line"> RNBridgeManager单例</span><br><span class="line"> */</span><br><span class="line">+ (instancetype)sharedManager;</span><br><span class="line"></span><br><span class="line">@end</span><br><span class="line"></span><br><span class="line">NS_ASSUME_NONNULL_END</span><br></pre></td></tr></table></figure>
+<p><strong>RNBridgeManager.m</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br></pre></td><td class="code"><pre><span class="line">#import &quot;RNBridgeManager.h&quot;</span><br><span class="line"></span><br><span class="line">#import &lt;React/RCTBundleURLProvider.h&gt;</span><br><span class="line"></span><br><span class="line">//dev模式下:RCTBridge required dispatch_sync to load RCTDevLoadingView Error Fix</span><br><span class="line">#if RCT_DEV</span><br><span class="line">#import &lt;React/RCTDevLoadingView.h&gt;</span><br><span class="line">#endif</span><br><span class="line">/**</span><br><span class="line"> 自定义类，实现RCTBridgeDelegate</span><br><span class="line"> */</span><br><span class="line">@interface BridgeHandle : NSObject&lt;RCTBridgeDelegate&gt;</span><br><span class="line"></span><br><span class="line">@end</span><br><span class="line"></span><br><span class="line">@implementation BridgeHandle</span><br><span class="line"></span><br><span class="line">- (NSURL *)sourceURLForBridge:(RCTBridge *)bridge&#123;</span><br><span class="line">    return [[RCTBundleURLProvider sharedSettings] jsBundleURLForBundleRoot:@&quot;index&quot; fallbackResource:nil];</span><br><span class="line">&#125;</span><br><span class="line">@end</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">@implementation RNBridgeManager</span><br><span class="line"></span><br><span class="line">+ (instancetype)sharedManager&#123;</span><br><span class="line">    static RNBridgeManager *manager;</span><br><span class="line">    static dispatch_once_t onceToken;</span><br><span class="line">    dispatch_once(&amp;onceToken, ^&#123;</span><br><span class="line">        manager = [[RNBridgeManager alloc] initWithDelegate:[[BridgeHandle alloc] init] launchOptions:nil];</span><br><span class="line">#if RCT_DEV</span><br><span class="line">        [manager moduleForClass:[RCTDevLoadingView class]];</span><br><span class="line">#endif</span><br><span class="line">    &#125;);</span><br><span class="line">     return manager;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">@end</span><br></pre></td></tr></table></figure>
+<h3 id="1-3-Native进入RN页面"><a href="#1-3-Native进入RN页面" class="headerlink" title="1.3 Native进入RN页面"></a>1.3 Native进入RN页面</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">RCTRootView *rootView = [[RCTRootView alloc] initWithBridge:[RNBridgeManager sharedManager] moduleName:@&quot;RNTest&quot; initialProperties:nil];</span><br><span class="line">UIViewController *vc = [[UIViewController alloc] init];</span><br><span class="line">vc.view = rootView;</span><br><span class="line">[self.navigationController pushViewController:vc animated:YES];</span><br></pre></td></tr></table></figure>
+<h3 id="1-4-RN调用Native方法"><a href="#1-4-RN调用Native方法" class="headerlink" title="1.4 RN调用Native方法"></a>1.4 RN调用Native方法</h3><ul>
+<li>创建一个交互的类，实现<code>&lt;RCTBridgeModule&gt;</code>协议；</li>
+<li>固定格式：在.m的实现中，首先导出模块名字<code>RCT_EXPORT_MODULE();</code>，<code>RCT_EXPORT_MODULE</code>接受字符串作为其Module的名称，如果不设置名称的话默认就使用类名作为Modul的名称；</li>
+<li>使用<code>RCT_EXPORT_METHOD</code>导出Native的方法；</li>
+</ul>
+<h4 id="1-4-1-比如我们导出Native端的SVProgressHUD提示方法："><a href="#1-4-1-比如我们导出Native端的SVProgressHUD提示方法：" class="headerlink" title="1.4.1 比如我们导出Native端的SVProgressHUD提示方法："></a>1.4.1 比如我们导出Native端的<code>SVProgressHUD</code>提示方法：</h4><p><strong>RNInterractModule.h</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">#import &lt;Foundation/Foundation.h&gt;</span><br><span class="line">#import &lt;React/RCTBridgeModule.h&gt;</span><br><span class="line"></span><br><span class="line">NS_ASSUME_NONNULL_BEGIN</span><br><span class="line"></span><br><span class="line">@interface RNInterractModule : NSObject&lt;RCTBridgeModule&gt;</span><br><span class="line"></span><br><span class="line">@end</span><br><span class="line"></span><br><span class="line">NS_ASSUME_NONNULL_END</span><br></pre></td></tr></table></figure>
+<p><strong>RNInterractModule.m</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">import &quot;RNInterractModule.h&quot;</span><br><span class="line">#import &quot;Util.h&quot;</span><br><span class="line">#import &lt;SVProgressHUD.h&gt;</span><br><span class="line"></span><br><span class="line">@implementation RNInterractModule</span><br><span class="line">////RCT_EXPORT_MODULE接受字符串作为其Module的名称，如果不设置名称的话默认就使用类名作为Modul的名称</span><br><span class="line">RCT_EXPORT_MODULE();</span><br><span class="line"></span><br><span class="line">//==============1、提示==============</span><br><span class="line">RCT_EXPORT_METHOD(showInfo:(NSString *) info)&#123;</span><br><span class="line">    dispatch_sync(dispatch_get_main_queue(), ^&#123;</span><br><span class="line">        [SVProgressHUD showInfoWithStatus:info];</span><br><span class="line">    &#125;);</span><br><span class="line">&#125;</span><br><span class="line">@end</span><br></pre></td></tr></table></figure>
+<h4 id="1-4-2-RN端调用导出的showInfo方法："><a href="#1-4-2-RN端调用导出的showInfo方法：" class="headerlink" title="1.4.2 RN端调用导出的showInfo方法："></a>1.4.2 RN端调用导出的showInfo方法：</h4><p>我们在RN端把Native的方法通过一个共同的utils工具类引入，如下</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="keyword">import</span> &#123; NativeModules &#125; <span class="keyword">from</span> <span class="string">'react-native'</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">//导出Native端的方法</span></span><br><span class="line"><span class="keyword">export</span> <span class="keyword">const</span> &#123; showInfo&#125; = NativeModules.RNInterractModule;</span><br></pre></td></tr></table></figure>
+<p>具体的RN页面使用时：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> &#123; showInfo &#125; <span class="keyword">from</span> <span class="string">"../utils"</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">//通过Button点击事件触发</span></span><br><span class="line">&lt;Button</span><br><span class="line">	title=<span class="string">'1、调用Native提示'</span></span><br><span class="line">	onPress=&#123;() =&gt; showInfo(<span class="string">'我是原生端的提示！'</span>)&#125;</span><br><span class="line">/&gt;</span><br></pre></td></tr></table></figure>
+<p>调用效果：<br><img src="https://ws1.sinaimg.cn/large/72ebc0edgy1fybv53uebvg208z0idaac.gif" alt="image"></p>
+<h4 id="1-4-3-RN回调Native"><a href="#1-4-3-RN回调Native" class="headerlink" title="1.4.3 RN回调Native"></a>1.4.3 RN回调Native</h4><blockquote>
+<p>RN文档显示，目前iOS端的回调还处于实验阶段</p>
+</blockquote>
+<p>我们提供一个例子来模拟：目前的需求是做面包，RN端能提供面粉，但是不会做，Native端是有做面包的功能；所以我们需要先把面粉，传给Native端，Native加工好面包之后，再通过回调回传给RN端。</p>
+<p>Native端提供方法</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">// 比如调用原生的方法处理图片、视频之类的，处理完成之后再把结果回传到RN页面里去</span><br><span class="line">//TODO（RN文档显示，目前iOS端的回调还处于实验阶段）</span><br><span class="line">RCT_EXPORT_METHOD(patCake:(NSString *)flour successBlock:(RCTResponseSenderBlock)successBlock errorBlock:(RCTResponseErrorBlock)errorBlock)&#123;</span><br><span class="line">    __weak __typeof(self)weakSelf = self;</span><br><span class="line">    dispatch_sync(dispatch_get_main_queue(), ^&#123;</span><br><span class="line">        NSString *cake = [weakSelf patCake:flour];</span><br><span class="line">        //模拟成功、失败的block判断</span><br><span class="line">        if([flour isKindOfClass:[NSString class]])&#123;</span><br><span class="line">            successBlock(@[@[cake]]);//此处参数需要放在数组里面</span><br><span class="line">        &#125;else&#123;</span><br><span class="line">            NSError *error = [NSError errorWithDomain:@&quot;com.RNTest&quot; code:-1 userInfo:@&#123;@&quot;message&quot;:@&quot;类型不匹配&quot;&#125;];</span><br><span class="line">            errorBlock(error);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">//使用RN端传递的参数字符串：&quot;&quot;，调用Native端的做面包方法，加工成面包，再回传给RN</span><br><span class="line">- (NSString *)patCake:(NSString *)flour&#123;</span><br><span class="line">    NSString * cake = [NSString stringWithFormat:@&quot;使用%@，做好了：🎂🍞🍞🍰🍰🍰&quot;,flour];</span><br><span class="line">    return cake;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>RN端调用：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//首先工具类里先引入</span></span><br><span class="line"><span class="keyword">export</span> <span class="keyword">const</span> &#123; showInfo,patCake &#125; = NativeModules.RNInterractModule;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment">//具体页面使用</span></span><br><span class="line">&lt;Button</span><br><span class="line">	title=<span class="string">'4、回调：使用面粉做蛋糕'</span></span><br><span class="line">	onPress=&#123;() =&gt; patCake(<span class="string">'1斤面粉'</span>,</span><br><span class="line">		(cake) =&gt; alert(cake),</span><br><span class="line">		(error) =&gt; alert(<span class="string">'出错了'</span> + error.message))&#125;</span><br><span class="line">	/&gt;</span><br></pre></td></tr></table></figure>
+<p>调用效果：</p>
+<p><img src="https://ws1.sinaimg.cn/large/72ebc0edgy1fybvin9v20g208z0idq4j.gif" alt="image"></p>
+<h4 id="1-4-4-使用Promise回调"><a href="#1-4-4-使用Promise回调" class="headerlink" title="1.4.4 使用Promise回调"></a>1.4.4 使用Promise回调</h4><p>Native端提供方法</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">RCT_EXPORT_METHOD(callNameTointroduction:(NSString *)name resolver:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock) reject)&#123;</span><br><span class="line">    __weak __typeof(self)weakSelf = self;</span><br><span class="line">    dispatch_sync(dispatch_get_main_queue(), ^&#123;</span><br><span class="line">        if ([name isKindOfClass:NSString.class]) &#123;</span><br><span class="line">            resolve([weakSelf introduction:name]);</span><br><span class="line">        &#125;else&#123;</span><br><span class="line">            NSError *error = [NSError errorWithDomain:@&quot;com.RNTest&quot; code:-1 userInfo:@&#123;@&quot;message&quot;:@&quot;类型不匹配&quot;&#125;];</span><br><span class="line">            reject(@&quot;class_error&quot;,@&quot;Needs NSString Class&quot;,error);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">- (NSString *)introduction:(NSString *)name&#123;</span><br><span class="line">    return [NSString stringWithFormat:@&quot;我的名字叫%@，今年18岁，喜欢运动、听歌...&quot;,name];</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>RN端调用：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//首先工具类里先引入</span></span><br><span class="line"><span class="keyword">export</span> <span class="keyword">const</span> &#123; showInfo,patCake, callNameTointroduction&#125; = NativeModules.RNInterractModule;</span><br><span class="line"></span><br><span class="line"><span class="comment">//具体页面使用</span></span><br><span class="line">&lt;Button</span><br><span class="line">	title=<span class="string">'5、Promise：点名自我介绍'</span></span><br><span class="line">	onPress=&#123;</span><br><span class="line">		<span class="keyword">async</span> () =&gt; &#123;</span><br><span class="line">			<span class="keyword">try</span> &#123;</span><br><span class="line">				<span class="keyword">let</span> introduction = <span class="keyword">await</span> callNameTointroduction(<span class="string">'小明'</span>);</span><br><span class="line">				showInfo(introduction);</span><br><span class="line">			&#125; <span class="keyword">catch</span> (e) &#123;</span><br><span class="line">				alert(e.message);</span><br><span class="line">			&#125;</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">/&gt;</span><br></pre></td></tr></table></figure>
+<p>调用效果：<br><img src="https://wx3.sinaimg.cn/large/72ebc0edgy1fybvoha3crg208z0id3z1.gif" alt="image"></p>
+<h3 id="1-5-Native端发送通知到RN"><a href="#1-5-Native端发送通知到RN" class="headerlink" title="1.5 Native端发送通知到RN"></a>1.5 Native端发送通知到RN</h3><p>Native端继承<code>RCTEventEmitter</code>,实现发送RN通知类：</p>
+<p><strong>RNNotificationManager.h</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">#import &lt;Foundation/Foundation.h&gt;</span><br><span class="line">#import &lt;React/RCTEventEmitter.h&gt;</span><br><span class="line">#import &lt;React/RCTBridgeModule.h&gt;</span><br><span class="line"></span><br><span class="line">NS_ASSUME_NONNULL_BEGIN</span><br><span class="line"></span><br><span class="line">@interface RNNotificationManager : RCTEventEmitter</span><br><span class="line"></span><br><span class="line">+ (instancetype)sharedManager;</span><br><span class="line"></span><br><span class="line">@end</span><br><span class="line"></span><br><span class="line">NS_ASSUME_NONNULL_END</span><br></pre></td></tr></table></figure>
+<p><strong>RNNotificationManager.m</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">#import &quot;RNNotificationManager.h&quot;</span><br><span class="line"></span><br><span class="line">@implementation RNNotificationManager</span><br><span class="line">&#123;</span><br><span class="line">    BOOL hasListeners;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">+ (instancetype)sharedManager&#123;</span><br><span class="line">    static RNNotificationManager *manager;</span><br><span class="line">    static dispatch_once_t onceToken;</span><br><span class="line">    dispatch_once(&amp;onceToken,^&#123;</span><br><span class="line">        manager = [[self alloc] init];</span><br><span class="line">    &#125;);</span><br><span class="line">    return manager;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">- (instancetype)init&#123;</span><br><span class="line">    self = [super init];</span><br><span class="line">    if (self) &#123;</span><br><span class="line">        NSNotificationCenter *center = [NSNotificationCenter defaultCenter];</span><br><span class="line">        [center removeObserver:self];</span><br><span class="line">        [center addObserver:self selector:@selector(handleEventNotification:) name:@&quot;kRNNotification_Login&quot; object:nil];</span><br><span class="line">        [center addObserver:self selector:@selector(handleEventNotification:) name:@&quot;kRNNotification_Logout&quot; object:nil];</span><br><span class="line">    &#125;;</span><br><span class="line">    return self;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">RCT_EXPORT_MODULE()</span><br><span class="line"></span><br><span class="line">- (NSArray&lt;NSString *&gt; *)supportedEvents&#123;</span><br><span class="line">    return @[</span><br><span class="line">             @&quot;kRNNotification_Login&quot;,</span><br><span class="line">             @&quot;kRNNotification_Logout&quot;</span><br><span class="line">             ];</span><br><span class="line">&#125;</span><br><span class="line">//优化无监听处理的事件</span><br><span class="line">//在添加第一个监听函数时触发</span><br><span class="line">- (void)startObserving&#123;</span><br><span class="line">    //setup any upstream listenerse or background tasks as necessary</span><br><span class="line">    hasListeners = YES;</span><br><span class="line">    NSLog(@&quot;-----------&gt;startObserving&quot;);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">//will be called when this mdules&apos;s last listener is removed,or on dealloc.</span><br><span class="line">- (void)stopObserving&#123;</span><br><span class="line">    //remove upstream listeners,stop unnecessary background tasks.</span><br><span class="line">    hasListeners = NO;</span><br><span class="line">    NSLog(@&quot;-----------&gt;stopObserving&quot;);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">+ (BOOL)requiresMainQueueSetup&#123;</span><br><span class="line">    return YES;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">- (void)handleEventNotification:(NSNotification *)notification&#123;</span><br><span class="line">    if (!hasListeners) &#123;</span><br><span class="line">        return;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    NSString *name = notification.name;</span><br><span class="line">    NSLog(@&quot;通知名字--------&gt;%@&quot;,name);</span><br><span class="line">    [self sendEventWithName:name body:notification.userInfo];</span><br><span class="line">    </span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">@end</span><br></pre></td></tr></table></figure>
+<p>RN端注册监听：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//utils工具类中导出</span></span><br><span class="line"><span class="keyword">export</span> <span class="keyword">const</span> NativeEmitterModuleIOS = <span class="keyword">new</span> NativeEventEmitter(NativeModules.RNNotificationManager);</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment">//具体页面使用</span></span><br><span class="line"><span class="keyword">import</span> &#123; NativeEmitterModuleIOS &#125; <span class="keyword">from</span> <span class="string">"../utils"</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">export</span> <span class="keyword">default</span> <span class="class"><span class="keyword">class</span> <span class="title">ActivityScene</span> <span class="keyword">extends</span> <span class="title">Component</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">constructor</span>(props) &#123;</span><br><span class="line">		<span class="keyword">super</span>(props);</span><br><span class="line">		<span class="keyword">this</span>.subscription = <span class="literal">null</span>;</span><br><span class="line">		<span class="keyword">this</span>.state = &#123;</span><br><span class="line">			loginInfo: <span class="string">'当前未登录'</span>,</span><br><span class="line">		&#125;;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	updateLoginInfoText = <span class="function">(<span class="params">reminder</span>) =&gt;</span> &#123;</span><br><span class="line">		<span class="keyword">this</span>.setState(&#123;<span class="attr">loginInfo</span>: reminder.message&#125;)</span><br><span class="line">	&#125;;</span><br><span class="line"></span><br><span class="line">	<span class="comment">//添加监听</span></span><br><span class="line">	componentWillMount() &#123;</span><br><span class="line">		<span class="keyword">this</span>.subscription = NativeEmitterModuleIOS.addListener(<span class="string">'kRNNotification_Login'</span>, <span class="keyword">this</span>.updateLoginInfoText);</span><br><span class="line">		</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="comment">//移除监听</span></span><br><span class="line">	componentWillUnmount() &#123;</span><br><span class="line">			<span class="built_in">console</span>.log(<span class="string">'ActivityScene---------&gt;'</span>, <span class="string">'移除通知'</span>);</span><br><span class="line">			<span class="keyword">this</span>.subscription.remove();</span><br><span class="line">	&#125;</span><br><span class="line">	render() &#123;</span><br><span class="line">		<span class="keyword">return</span> (</span><br><span class="line">			&lt;View style=&#123;&#123;<span class="attr">flex</span>: <span class="number">1</span>, <span class="attr">backgroundColor</span>: <span class="string">'white'</span>&#125;&#125;&gt;</span><br><span class="line">				&lt;Button</span><br><span class="line">					title=<span class="string">'3、RN Push到Native 发送通知页面'</span></span><br><span class="line">					onPress=&#123;() =&gt; pushNative(RNEmitter)&#125;</span><br><span class="line">				/&gt;</span><br><span class="line">				&lt;Text style=&#123;&#123;<span class="attr">fontSize</span>: <span class="number">20</span>, <span class="attr">color</span>: <span class="string">'red'</span>, <span class="attr">textAlign</span>: <span class="string">'center'</span>,<span class="attr">marginTop</span>:<span class="number">50</span>&#125;&#125;&gt;&#123;<span class="keyword">this</span>.state.loginInfo&#125;&lt;<span class="regexp">/Text&gt;</span></span><br><span class="line"><span class="regexp">			&lt;/</span>View&gt;</span><br><span class="line">		);</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>效果展示：</p>
+<p><img src="https://ws1.sinaimg.cn/large/72ebc0edgy1fyd60aqb8bg208z0idabx.gif" alt="image"></p>
+<h3 id="1-6-完整Demo（包含iOS-amp-Android"><a href="#1-6-完整Demo（包含iOS-amp-Android" class="headerlink" title="1.6 完整Demo（包含iOS &amp; Android)"></a>1.6 完整Demo（包含iOS &amp; Android)</h3><p><a href="https://github.com/BulldogX/RN-NativeTest.git" target="_blank" rel="noopener">RN-NativeTest</a></p>
+
+            
+
+        </div>
+    </div>
+    <div id="post-footer" class="post-footer main-content-wrap">
+        
+            <div class="post-footer-tags">
+                <span class="text-color-light text-small">标签</span><br/>
+                
+    <a class="tag tag--primary tag--small t-link" href="/tags/ReactNative/">ReactNative</a>
+
+            </div>
+        
+        
+            <div class="post-actions-wrap">
+    <nav>
+        <ul class="post-actions post-action-nav">
+            <li class="post-action">
+                
+                    <a class="post-action-btn btn btn--disabled">
+                
+                    <i class="fa fa-angle-left" aria-hidden="true"></i>
+                    <span class="hide-xs hide-sm text-small icon-ml">上一篇</span>
+                </a>
+            </li>
+            <li class="post-action">
+                
+                    
+                    <a class="post-action-btn btn btn--default tooltip--top" href="/2018/12/18/ReactNative/ReactNative与Android的交互/" data-tooltip="ReactNative与Android的交互" aria-label="下一篇: ReactNative与Android的交互">
+                
+                    <span class="hide-xs hide-sm text-small icon-mr">下一篇</span>
+                    <i class="fa fa-angle-right" aria-hidden="true"></i>
+                </a>
+            </li>
+        </ul>
+    </nav>
+    <ul class="post-actions post-action-share">
+        <li class="post-action hide-lg hide-md hide-sm">
+            <a class="post-action-btn btn btn--default btn-open-shareoptions" href="#btn-open-shareoptions" aria-label="Diesen Beitrag teilen">
+                <i class="fa fa-share-alt" aria-hidden="true"></i>
+            </a>
+        </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a class="post-action-btn btn btn--default" target="new" href="https://www.facebook.com/sharer/sharer.php?u=http://yoursite.com/2018/12/20/ReactNative/ReactNative与iOS的交互/" title="分享到 Facebook">
+                    <i class="fab fa-facebook" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a class="post-action-btn btn btn--default" target="new" href="https://twitter.com/intent/tweet?text=http://yoursite.com/2018/12/20/ReactNative/ReactNative与iOS的交互/" title="分享到 Twitter">
+                    <i class="fab fa-twitter" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a class="post-action-btn btn btn--default" target="new" href="https://plus.google.com/share?url=http://yoursite.com/2018/12/20/ReactNative/ReactNative与iOS的交互/" title="分享到 Google+">
+                    <i class="fab fa-google-plus" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+        
+            
+                <li class="post-action">
+                    <a class="post-action-btn btn btn--default" href="#disqus_thread">
+                        <i class="fa fa-comment"></i>
+                    </a>
+                </li>
+            
+        
+        <li class="post-action">
+            
+                <a class="post-action-btn btn btn--default" href="#" aria-label="Nach oben">
+            
+                <i class="fa fa-list" aria-hidden="true"></i>
+            </a>
+        </li>
+    </ul>
+</div>
+
+
+        
+        
+            
+                <div id="disqus_thread">
+    <noscript>Please enable JavaScript to view the <a href="//disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+            
+        
+    </div>
+</article>
+
+
+
+                <footer id="footer" class="main-content-wrap">
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js">
+</script>
+    <span class="copyrights">
+        Copyrights &copy; 2018 BulldogX. All Rights Reserved.
+    </span>
+    <span id="busuanzi_container_site_uv">
+  您是本站第<span id="busuanzi_value_site_uv"></span>位访问者
+</span>
+</footer>
+
+            </div>
+            
+                <div id="bottom-bar" class="post-bottom-bar" data-behavior="2">
+                    <div class="post-actions-wrap">
+    <nav>
+        <ul class="post-actions post-action-nav">
+            <li class="post-action">
+                
+                    <a class="post-action-btn btn btn--disabled">
+                
+                    <i class="fa fa-angle-left" aria-hidden="true"></i>
+                    <span class="hide-xs hide-sm text-small icon-ml">上一篇</span>
+                </a>
+            </li>
+            <li class="post-action">
+                
+                    
+                    <a class="post-action-btn btn btn--default tooltip--top" href="/2018/12/18/ReactNative/ReactNative与Android的交互/" data-tooltip="ReactNative与Android的交互" aria-label="下一篇: ReactNative与Android的交互">
+                
+                    <span class="hide-xs hide-sm text-small icon-mr">下一篇</span>
+                    <i class="fa fa-angle-right" aria-hidden="true"></i>
+                </a>
+            </li>
+        </ul>
+    </nav>
+    <ul class="post-actions post-action-share">
+        <li class="post-action hide-lg hide-md hide-sm">
+            <a class="post-action-btn btn btn--default btn-open-shareoptions" href="#btn-open-shareoptions" aria-label="Diesen Beitrag teilen">
+                <i class="fa fa-share-alt" aria-hidden="true"></i>
+            </a>
+        </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a class="post-action-btn btn btn--default" target="new" href="https://www.facebook.com/sharer/sharer.php?u=http://yoursite.com/2018/12/20/ReactNative/ReactNative与iOS的交互/" title="分享到 Facebook">
+                    <i class="fab fa-facebook" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a class="post-action-btn btn btn--default" target="new" href="https://twitter.com/intent/tweet?text=http://yoursite.com/2018/12/20/ReactNative/ReactNative与iOS的交互/" title="分享到 Twitter">
+                    <i class="fab fa-twitter" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a class="post-action-btn btn btn--default" target="new" href="https://plus.google.com/share?url=http://yoursite.com/2018/12/20/ReactNative/ReactNative与iOS的交互/" title="分享到 Google+">
+                    <i class="fab fa-google-plus" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+        
+            
+                <li class="post-action">
+                    <a class="post-action-btn btn btn--default" href="#disqus_thread">
+                        <i class="fa fa-comment"></i>
+                    </a>
+                </li>
+            
+        
+        <li class="post-action">
+            
+                <a class="post-action-btn btn btn--default" href="#" aria-label="Nach oben">
+            
+                <i class="fa fa-list" aria-hidden="true"></i>
+            </a>
+        </li>
+    </ul>
+</div>
+
+
+                </div>
+                <div id="share-options-bar" class="share-options-bar" data-behavior="2">
+    <i id="btn-close-shareoptions" class="fa fa-times"></i>
+    <ul class="share-options">
+        
+            
+            
+            <li class="share-option">
+                <a class="share-option-btn" target="new" href="https://www.facebook.com/sharer/sharer.php?u=http://yoursite.com/2018/12/20/ReactNative/ReactNative与iOS的交互/">
+                    <i class="fab fa-facebook" aria-hidden="true"></i><span>分享到 Facebook</span>
+                </a>
+            </li>
+        
+            
+            
+            <li class="share-option">
+                <a class="share-option-btn" target="new" href="https://twitter.com/intent/tweet?text=http://yoursite.com/2018/12/20/ReactNative/ReactNative与iOS的交互/">
+                    <i class="fab fa-twitter" aria-hidden="true"></i><span>分享到 Twitter</span>
+                </a>
+            </li>
+        
+            
+            
+            <li class="share-option">
+                <a class="share-option-btn" target="new" href="https://plus.google.com/share?url=http://yoursite.com/2018/12/20/ReactNative/ReactNative与iOS的交互/">
+                    <i class="fab fa-google-plus" aria-hidden="true"></i><span>分享到 Google+</span>
+                </a>
+            </li>
+        
+    </ul>
+</div>
+
+            
+        </div>
+        
+
+
+    
+        
+    
+
+<div id="about">
+    <div id="about-card">
+        <div id="about-btn-close">
+            <i class="fa fa-times"></i>
+        </div>
+        
+            <img id="about-card-picture" src="/assets/images/Avatar_icefrog.jpg" alt="作者的图片"/>
+        
+            <h4 id="about-card-name">BulldogX</h4>
+        
+            <div id="about-card-bio"><p style='color:red'>国家一级抬杠运动员</p></div>
+        
+        
+            <div id="about-card-job">
+                <i class="fa fa-briefcase"></i>
+                <br/>
+                <p>APP开发工程师</p>
+
+            </div>
+        
+        
+            <div id="about-card-location">
+                <i class="fa fa-map-marker-alt"></i>
+                <br/>
+                ShangHai
+            </div>
+        
+    </div>
+</div>
+
+        
+        
+<div id="cover" style="background-image:url('/assets/images/cover.jpg');"></div>
+        <!--SCRIPTS-->
+<script src="/assets/js/script-vufjrm3fmbuttogo1hxuu0w9w0sesk5iyysjuguc2hdhufot9szxg8twijry.min.js"></script>
+<!--SCRIPTS END-->
+
+    
+        <script>
+             var disqus_config = function () {
+                 this.page.url = 'http://yoursite.com/2018/12/20/ReactNative/ReactNative与iOS的交互/';
+                 
+                    this.page.identifier = '2018/12/20/ReactNative/ReactNative与iOS的交互/';
+                 
+             };
+            (function() {
+                var d = document, s = d.createElement('script');
+                var disqus_shortname = 'bulldogx';
+                s.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+
+                s.setAttribute('data-timestamp', +new Date());
+                (d.head || d.body).appendChild(s);
+            })();
+        </script>
+    
+
+
+
+    </body>
+</html>

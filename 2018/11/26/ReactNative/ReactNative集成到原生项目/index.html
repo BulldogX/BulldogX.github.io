@@ -1,0 +1,614 @@
+
+<!DOCTYPE html>
+<html lang="zh-cn">
+    
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="generator" content="BulldogX&#39;s Notes">
+    <title>ReactNative集成至现有原生项目 - BulldogX&#39;s Notes</title>
+    <meta name="author" content="BulldogX">
+    
+    
+    
+    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"BulldogX","sameAs":[],"image":"/Avatar_icefrog.jpg"},"articleBody":"一、准备\n1、 创建 /ios目录，并拷贝iOS原生项目的所有工程文件到该目录下；\n2、 创建/android目录，并拷贝Android原生项目的所有工程文件到该目录下；\n3、 在根目录下创建package.json文件，并添加如下内容；\n\n12345678&#123;    \"name\": \"MyReactNativeApp\",    \"version\": \"0.0.1\",    \"private\": true,    \"scripts\": &#123;      \"start\": \"node node_modules/react-native/local-cli/cli.js start\"    &#125;  &#125;\n\n\n4、 根目录下执行 yarn add react-native 或者npm i --save react-native`\n5、 安装与当前react-native版本配套的react\n可以根据步骤四中输出的警告信息查看，具体版本如：warning &quot;react-native@0.57.6&quot; has unmet peer dependency &quot;react@16.6.1&quot;.或者直接查看react-native的package.json中依赖react的版本package.json\n\n\n\nyarn add react@16.6.1 或 npm i --save react@16.6.1`\n\n6、 工程目录\n\n二、iOS集成\n注意：此处默认本机cocoapods已安装完成，未安装的可先google对应教程安装。参考：CocoaPods安装方法\n\n\n1、 在\\ios根目录下，终端执行pod init，生成Podfile文件；\n2、 编辑Podfile文件，可参考如下配置：\n\n123456789101112131415161718192021222324252627282930313233343536373839404142434445464748 # Uncomment the next line to define a global platform for your project platform :ios, '9.0'target 'MyReactNativeApp' do  # Uncomment the next line if you're using Swift or would like to use dynamic frameworks  # use_frameworks!  # Pods for MyReactNativeApp  # 'node_modules'目录一般位于根目录中  # 但是如果你的结构不同，那你就要根据实际路径修改下面的`:path`  pod 'React', :path =&gt; '../node_modules/react-native', :subspecs =&gt; [    'Core',    'CxxBridge', # 如果RN版本 &gt;= 0.47则加入此行    'DevSupport', # 如果RN版本 &gt;= 0.43，则需要加入此行才能开启开发者菜单    'RCTText',    'RCTNetwork',    'RCTWebSocket', # 调试功能需要此模块    'RCTAnimation', # FlatList和原生动画功能需要此模块    # 在这里继续添加你所需要的其他RN模块    'RCTActionSheet',    'RCTBlob',    'RCTGeolocation',    'RCTImage',    'RCTSettings',    'RCTVibration',    'RCTLinkingIOS',  ]  # 如果你的RN版本 &gt;= 0.42.0，则加入下面这行  pod 'yoga', :path =&gt; '../node_modules/react-native/ReactCommon/yoga'  # 如果RN版本 &gt;= 0.45则加入下面三个第三方编译依赖  pod 'DoubleConversion', :podspec =&gt; '../node_modules/react-native/third-party-podspecs/DoubleConversion.podspec'  pod 'glog', :podspec =&gt; '../node_modules/react-native/third-party-podspecs/glog.podspec'  pod 'Folly', :podspec =&gt; '../node_modules/react-native/third-party-podspecs/Folly.podspec'  target 'MyReactNativeAppTests' do    inherit! :search_paths    # Pods for testing  end  target 'MyReactNativeAppUITests' do    inherit! :search_paths    # Pods for testing  endend\n\n3、 执行pod install；\n4、 工程根目录下创建index.js\n\n1234567891011121314151617181920212223242526import React, &#123;Component&#125; from 'react';import &#123;\tAppRegistry,\tStyleSheet,\tView,\tText,&#125; from 'react-native';class index extends Component &#123;\trender() &#123;\t\treturn (\t\t\t&lt;View style=&#123;styles.container&#125;&gt;\t\t\t\t&lt;Text style=&#123;&#123;fontSize:20&#125;&#125;&gt;我是ReactNative !&lt;/Text&gt;\t\t\t&lt;/View&gt;\t\t);\t&#125;&#125;const styles = StyleSheet.create(&#123;\tcontainer:&#123;\t\tflex:1,\t\tbackgroundColor:'green',\t\tjustifyContent:'center',\t\talignItems:'center'\t&#125;&#125;);AppRegistry.registerComponent(\"MyReactNativeApp\", () =&gt; index);\n\n5、 在原生项目中测试：\n\n在需要跳转的ViewController：\n12345678910111213#import &lt;React/RCTRootView.h&gt;#import &lt;React/RCTBundleURLProvider.h&gt;- (void)pushToReactNativeVc &#123;\tNSURL *jsBundleLocation = [[RCTBundleURLProvider sharedSettings] jsBundleURLForBundleRoot:@&quot;index&quot; fallbackResource:nil];    RCTRootView *rootView = [[RCTRootView alloc] initWithBundleURL:jsBundleLocation moduleName:@&quot;MyReactNativeApp&quot; initialProperties:nil launchOptions:nil];        UIViewController *vc = [[UIViewController alloc] init];    vc.view = rootView;    [self.navigationController pushViewController:vc animated:YES];&#125;\nTips：如果遇到 如下错误打开Build Phases→Link Binary With Libraries点击 + ,然后添加如下的.a静态库\n三、Android集成3.1 配置Gradle\n1、Maven是基于项目对象模型(POM project object model)，可以通过一小段描述信息（配置）来管理项目的构建，报告和文档的软件项目管理工具。Maven的核心功能便是合理叙述项目间的依赖关系，通俗点讲，就是通过pom.xml文件的配置获取jar包，而不用手动去添加jar包；2、Gradle抛弃了传统基于XML（如Ant和Maven）的各种繁琐配置，使用了基于Groovy的领域特定语言（DSL）来声明项目配置。3、Gradle兼容Maven仓库。\n\n3.1.1 在app 中 build.gradle 文件中添加 React Native 依赖12345dependencies &#123;    implementation 'com.android.support:appcompat-v7:23.0.1'    ...    implementation \"com.facebook.react:react-native:+\" // From node_modules&#125;\n\n如果想要指定特定的 React Native 版本，可以用具体的版本号替换 +，当然前提是你从 npm 里下载的是这个版本。\n\n3.1.2 在项目的 build.gradle 文件中为 React Native 添加一个 maven 依赖的入口，必须写在 “allprojects” 代码块中:12345678910allprojects &#123;    repositories &#123;        maven &#123;            // All of React Native (JS, Android binaries) is installed from npm            url \"$rootDir/../node_modules/react-native/android\"        &#125;        ...    &#125;    ...&#125;\n\n确保依赖路径的正确！以免在 Android Studio 运行 Gradle 同步构建时抛出 “Failed to resolve: com.facebook.react:react-native:0.x.x” 异常。\n\n3.2 配置权限3.2.1 在 AndroidManifest.xml 清单文件中声明网络权限:1&lt;uses-permission android:name=\"android.permission.INTERNET\" /&gt;\n3.2.2 如果需要访问 DevSettingsActivity 界面（即开发者菜单），则还需要在 AndroidManifest.xml 中声明:1&lt;activity android:name=\"com.facebook.react.devsupport.DevSettingsActivity\" /&gt;\n3.2.3 修改abiFilters123ndk &#123;       abiFilters \"armeabi-v7a\", \"x86\"    &#125;\n原因\nreact-native生成aar的源码在npm install命令下载生成的&#39;$项目根目录&#39;\\node_modules\\react-native\\ReactAndroid中；aar中关于对于CPU限制在&#39;$项目根目录&#39;\\node_modules\\react-native\\ReactAndroid\\src\\main\\jni\\Application.mk ,在这个文件中，我们可以到：\n1234567891011121314151617APP_BUILD_SCRIPT := Android.mkAPP_ABI := armeabi-v7a x86APP_PLATFORM := android-16APP_MK_DIR := $(dir $(lastword $(MAKEFILE_LIST)))NDK_MODULE_PATH := $(APP_MK_DIR)$(HOST_DIRSEP)$(THIRD_PARTY_NDK_DIR)$(HOST_DIRSEP)$(REACT_COMMON_DIR)$(HOST_DIRSEP)$(APP_MK_DIR)first-partyAPP_STL := gnustl_shared# Make sure every shared lib includes a .note.gnu.build-id headerAPP_CFLAGS := -Wall -WerrorAPP_CPPFLAGS := -std=c++1yAPP_LDFLAGS := -Wl,--build-idNDK_TOOLCHAIN_VERSION := 4.9\n说明了CPU的类型限定在了armeabi-v7a和x86上\n3.3 加载ReactNative视图方式一、继承ReactActivity\n需要使用RN的页面继承ReactActivity\n\n12345678910111213import com.facebook.react.ReactActivity;public class MainActivity extends ReactActivity &#123;    /**     * Returns the name of the main component registered from JavaScript.     * This is used to schedule rendering of the component.     */    @Override    protected String getMainComponentName() &#123;        return \"MyReactNativeApp\";    &#125;&#125;\n\nApplication中实现ReactApplication的方法，如下：\n\n12345678910111213141516171819202122@Override    public ReactNativeHost getReactNativeHost() &#123;        return reactNativeHost;    &#125;private final ReactNativeHost reactNativeHost = new ReactNativeHost(this) &#123;    @Override    public boolean getUseDeveloperSupport() &#123;        return BuildConfig.DEBUG;    &#125;    @Override    protected List&lt;ReactPackage&gt; getPackages() &#123;        return Arrays.&lt;ReactPackage&gt;asList(                new MainReactPackage()        );    &#125;    @Override    protected String getJSMainModuleName()&#123;        return \"index\";    &#125;&#125;;\n方式二、在布局中加入ReactRootView，通过 ReactInstanceManager加载管理JS\n1、配置权限以便开发中的红屏错误能正确显示\n如果你的应用会运行在 Android 6.0（API level 23）或更高版本，请确保你在开发版本中有打开悬浮窗(overlay)权限。你可以在代码中使用Settings.canDrawOverlays(this);来检查。之所以需要这一权限，是因为我们会把开发中的报错显示在悬浮窗中（仅在开发阶段需要）。在 Android 6.0（API level 23）中用户需要手动同意授权。具体请求授权的做法是在onCreate()中添加如下代码。其中OVERLAY_PERMISSION_REQ_CODE是用于回传授权结果的字段。\n\n\n1234567891011private final int OVERLAY_PERMISSION_REQ_CODE = 1;  // 任写一个值...if (Build.VERSION.SDK_INT &gt;= Build.VERSION_CODES.M) &#123;    if (!Settings.canDrawOverlays(this)) &#123;        Intent intent = new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION,                                   Uri.parse(\"package:\" + getPackageName()));        startActivityForResult(intent, OVERLAY_PERMISSION_REQ_CODE);    &#125;&#125;\n重写onActivityResult()方法\n12345678910@Overrideprotected void onActivityResult(int requestCode, int resultCode, Intent data) &#123;    if (requestCode == OVERLAY_PERMISSION_REQ_CODE) &#123;        if (Build.VERSION.SDK_INT &gt;= Build.VERSION_CODES.M) &#123;            if (!Settings.canDrawOverlays(this)) &#123;                // SYSTEM_ALERT_WINDOW permission not granted            &#125;        &#125;    &#125;&#125;\n\n接下来添加一些原生代码来启动 React Native 的运行时环境并让它开始渲染。首先需要在一个Activity中创建一个ReactRootView对象，然后在这个对象之中启动 React Native 应用，并将它设为界面的主视图。\n\n\n如果你想在安卓 5.0 以下的系统上运行，请用 com.android.support:appcompat 包中的 AppCompatActivity 代替 Activity 。\n\n1234567891011121314151617181920212223242526272829303132333435363738public class MyReactActivity extends Activity implements DefaultHardwareBackBtnHandler &#123;    private ReactRootView mReactRootView;    private ReactInstanceManager mReactInstanceManager;    @Override    protected void onCreate(Bundle savedInstanceState) &#123;        super.onCreate(savedInstanceState);        mReactRootView = new ReactRootView(this);        mReactInstanceManager = ReactInstanceManager.builder()                .setApplication(getApplication())                .setBundleAssetName(\"index.android.bundle\")                .setJSMainModulePath(\"index\")                .addPackage(new MainReactPackage())                .setUseDeveloperSupport(BuildConfig.DEBUG)                .setInitialLifecycleState(LifecycleState.RESUMED)                .build();        // 注意这里的MyReactNativeApp必须对应“index.js”中的        // “AppRegistry.registerComponent()”的第一个参数       mReactRootView.startReactApplication(mReactInstanceManager, \"MyReactNativeApp\", null);        setContentView(mReactRootView);    &#125;    @Override    public void invokeDefaultOnBackPressed() &#123;        super.onBackPressed();    &#125;            @Override\tpublic void onBackPressed() &#123;\t    if (mReactInstanceManager != null) &#123;\t        mReactInstanceManager.onBackPressed();\t    &#125; else &#123;\t        super.onBackPressed();\t    &#125;\t&#125;&#125;\n\n生命周期\n\n123456789101112131415161718192021222324252627282930@Overrideprotected void onPause() &#123;    super.onPause();    if (mReactInstanceManager != null) &#123;        mReactInstanceManager.onHostPause(this);    &#125;&#125;@Overrideprotected void onResume() &#123;    super.onResume();    if (mReactInstanceManager != null) &#123;        mReactInstanceManager.onHostResume(this, this);    &#125;&#125;@Overrideprotected void onDestroy() &#123;    super.onDestroy();    if (mReactInstanceManager != null) &#123;        mReactInstanceManager.onHostDestroy(this);    &#125;    if (mReactRootView != null) &#123;        mReactRootView.unmountReactApplication();    &#125;&#125;\n\n弹出RN的开发者菜单\n\n12345678@Override    public boolean onKeyUp(int keyCode, KeyEvent event) &#123;        if (keyCode == KeyEvent.KEYCODE_MENU &amp;&amp; mReactInstanceManager != null) &#123;            mReactInstanceManager.showDevOptionsDialog();            return true;        &#125;        return super.onKeyUp(keyCode, event);    &#125;\n3.4 Android相关报错处理\n1、so库冲突\n\n\n处理：在app下的build.gride中添加如下设置\n\n1234packagingOptions &#123;        pickFirst 'lib/x86/libgnustl_shared.so'        pickFirst 'lib/armeabi-v7a/libgnustl_shared.so'    &#125;\n","dateCreated":"2018-11-26T11:13:31+08:00","dateModified":"2018-12-20T16:59:56+08:00","datePublished":"2018-11-26T11:13:31+08:00","description":"一、准备\n1、 创建 /ios目录，并拷贝iOS原生项目的所有工程文件到该目录下；\n2、 创建/android目录，并拷贝Android原生项目的所有工程文件到该目录下；\n3、 在根目录下创建package.json文件，并添加如下内容；\n\n12345678&#123;    \"name\": \"MyReactNativeApp\",    \"version\": \"0.0.1\",    \"private\": true,    \"scripts\": &#123;      \"start\": \"node node_modules/react-native/local-cli/cli.js start\"    &#125;  &#125;","headline":"ReactNative集成至现有原生项目","image":[],"mainEntityOfPage":{"@type":"WebPage","@id":"http://yoursite.com/2018/11/26/ReactNative/ReactNative集成到原生项目/"},"publisher":{"@type":"Organization","name":"BulldogX","sameAs":[],"image":"/Avatar_icefrog.jpg","logo":{"@type":"ImageObject","url":"/Avatar_icefrog.jpg"}},"url":"http://yoursite.com/2018/11/26/ReactNative/ReactNative集成到原生项目/","keywords":"ReactNative"}</script>
+    <meta name="description" content="一、准备 1、 创建 /ios目录，并拷贝iOS原生项目的所有工程文件到该目录下； 2、 创建/android目录，并拷贝Android原生项目的所有工程文件到该目录下； 3、 在根目录下创建package.json文件，并添加如下内容；  12345678&amp;#123;    &quot;name&quot;: &quot;MyReactNativeApp&quot;,    &quot;version&quot;: &quot;0.0.1&quot;,    &quot;privat">
+<meta name="keywords" content="ReactNative">
+<meta property="og:type" content="blog">
+<meta property="og:title" content="ReactNative集成至现有原生项目">
+<meta property="og:url" content="http://yoursite.com/2018/11/26/ReactNative/ReactNative集成到原生项目/index.html">
+<meta property="og:site_name" content="BulldogX&#39;s Notes">
+<meta property="og:description" content="一、准备 1、 创建 /ios目录，并拷贝iOS原生项目的所有工程文件到该目录下； 2、 创建/android目录，并拷贝Android原生项目的所有工程文件到该目录下； 3、 在根目录下创建package.json文件，并添加如下内容；  12345678&amp;#123;    &quot;name&quot;: &quot;MyReactNativeApp&quot;,    &quot;version&quot;: &quot;0.0.1&quot;,    &quot;privat">
+<meta property="og:locale" content="zh-cn">
+<meta property="og:image" content="https://wx2.sinaimg.cn/large/72ebc0edgy1fxtcptdmsrj20bu08imxq.jpg">
+<meta property="og:image" content="https://wx1.sinaimg.cn/large/72ebc0edgy1fxtc7evml1j22jk1564qr.jpg">
+<meta property="og:image" content="https://wx4.sinaimg.cn/large/72ebc0edgy1fxtc8j521fj20mo0pygvg.jpg">
+<meta property="og:image" content="https://ws4.sinaimg.cn/large/72ebc0edgy1fxtcdi9palj21je0eg3zj.jpg">
+<meta property="og:updated_time" content="2018-12-20T08:59:56.944Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="ReactNative集成至现有原生项目">
+<meta name="twitter:description" content="一、准备 1、 创建 /ios目录，并拷贝iOS原生项目的所有工程文件到该目录下； 2、 创建/android目录，并拷贝Android原生项目的所有工程文件到该目录下； 3、 在根目录下创建package.json文件，并添加如下内容；  12345678&amp;#123;    &quot;name&quot;: &quot;MyReactNativeApp&quot;,    &quot;version&quot;: &quot;0.0.1&quot;,    &quot;privat">
+<meta name="twitter:image" content="https://wx2.sinaimg.cn/large/72ebc0edgy1fxtcptdmsrj20bu08imxq.jpg">
+    
+    
+        
+    
+    
+        <meta property="og:image" content="http://yoursite.com/assets/images/Avatar_icefrog.jpg"/>
+    
+    
+    
+    
+    <!--STYLES-->
+    <link rel="stylesheet" href="/assets/css/style-du2xmrqdqrl2ollgeiw050kpl6l4nbyz7bumjuurjgsxyopifvukebxc9lqe.min.css">
+    <!--STYLES END-->
+    
+
+    
+</head>
+
+    <body>
+        <div id="blog">
+            <!-- Define author's picture -->
+
+
+    
+        
+            
+        
+    
+
+<header id="header" data-behavior="2">
+    <i id="btn-open-sidebar" class="fa fa-lg fa-bars"></i>
+    <div class="header-title">
+        <a class="header-title-link" href="/ ">BulldogX&#39;s Notes</a>
+    </div>
+    
+        
+            <a  class="header-right-picture "
+                href="#about">
+        
+        
+            <img class="header-picture" src="/assets/images/Avatar_icefrog.jpg" alt="作者的图片"/>
+        
+        </a>
+    
+</header>
+
+            <!-- Define author's picture -->
+
+
+
+        
+    
+
+<nav id="sidebar" data-behavior="2">
+    <div class="sidebar-container">
+        
+            <div class="sidebar-profile">
+                <a href="/#about">
+                    <img class="sidebar-profile-picture" src="/assets/images/Avatar_icefrog.jpg" alt="作者的图片"/>
+                </a>
+                <h4 class="sidebar-profile-name">BulldogX</h4>
+                
+                    <h5 class="sidebar-profile-bio"><p style='color:red'>国家一级抬杠运动员</p></h5>
+                
+            </div>
+        
+        
+            <ul class="sidebar-buttons">
+            
+                <li class="sidebar-button">
+                    
+                        <a  class="sidebar-button-link "
+                             href="/ "
+                            
+                            title="首页"
+                        >
+                    
+                        <i class="sidebar-button-icon fa fa-home" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">首页</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a  class="sidebar-button-link "
+                             href="/all-categories"
+                            
+                            title="分类"
+                        >
+                    
+                        <i class="sidebar-button-icon fa fa-bookmark" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">分类</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a  class="sidebar-button-link "
+                             href="/all-tags"
+                            
+                            title="标签"
+                        >
+                    
+                        <i class="sidebar-button-icon fa fa-tags" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">标签</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a  class="sidebar-button-link "
+                             href="/all-archives"
+                            
+                            title="归档"
+                        >
+                    
+                        <i class="sidebar-button-icon fa fa-archive" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">归档</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a  class="sidebar-button-link open-algolia-search"
+                             href="#search"
+                            
+                            title="搜索"
+                        >
+                    
+                        <i class="sidebar-button-icon fa fa-search" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">搜索</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a  class="sidebar-button-link "
+                             href="#about"
+                            
+                            title="关于"
+                        >
+                    
+                        <i class="sidebar-button-icon fa fa-question" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">关于</span>
+                    </a>
+            </li>
+            
+        </ul>
+        
+            <ul class="sidebar-buttons">
+            
+        </ul>
+        
+    </div>
+</nav>
+
+            
+            <div id="main" data-behavior="2"
+                 class="
+                        hasCoverMetaIn
+                        ">
+                
+<article class="post">
+    
+    
+        <div class="post-header main-content-wrap text-left">
+    
+        <h1 class="post-title">
+            ReactNative集成至现有原生项目
+        </h1>
+    
+    
+        <div class="post-meta">
+    <time datetime="2018-11-26T11:13:31+08:00">
+	
+		    11月 26, 2018
+    	
+    </time>
+    
+        <span>发布在 </span>
+        
+    <a class="category-link" href="/categories/ReactNative/">ReactNative</a>
+
+
+    
+    <!--如果是文章页面则显示阅读统计>-->
+        
+        <span id="busuanzi_container_page_pv">
+         | 本文共被围观 <span id="busuanzi_value_page_pv"></span> 次.
+        </span>
+        
+</div>
+
+    
+</div>
+
+    
+    <div class="post-content markdown">
+        <div class="main-content-wrap">
+            <h2 id="一、准备"><a href="#一、准备" class="headerlink" title="一、准备"></a>一、准备</h2><ul>
+<li><strong>1、 创建 <code>/ios</code>目录，并拷贝iOS原生项目的所有工程文件到该目录下；</strong></li>
+<li><strong>2、 创建<code>/android</code>目录，并拷贝Android原生项目的所有工程文件到该目录下；</strong></li>
+<li><strong>3、 在根目录下创建<code>package.json</code>文件，并添加如下内容；</strong></li>
+</ul>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">&#123;  </span><br><span class="line">  <span class="string">"name"</span>: <span class="string">"MyReactNativeApp"</span>,  </span><br><span class="line">  <span class="string">"version"</span>: <span class="string">"0.0.1"</span>,  </span><br><span class="line">  <span class="string">"private"</span>: <span class="literal">true</span>,  </span><br><span class="line">  <span class="string">"scripts"</span>: &#123;  </span><br><span class="line">    <span class="string">"start"</span>: <span class="string">"node node_modules/react-native/local-cli/cli.js start"</span>  </span><br><span class="line">  &#125;  </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<a id="more"></a>
+<ul>
+<li><strong>4、 根目录下执行</strong> <code>yarn add react-native</code> 或者<code>npm i --save react-native`</code></li>
+<li><strong>5、 安装与当前<code>react-native</code>版本配套的<code>react</code></strong><blockquote>
+<p>可以根据步骤四中输出的警告信息查看，具体版本如：<code>warning &quot;react-native@0.57.6&quot; has unmet peer dependency &quot;react@16.6.1&quot;.</code><br>或者直接查看react-native的package.json中依赖react的版本<a href="https://github.com/facebook/react-native/blob/master/package.json" target="_blank" rel="noopener">package.json</a></p>
+</blockquote>
+</li>
+</ul>
+<p><code>yarn add react@16.6.1</code> 或 <code>npm i --save react@16.6.1`</code><br><br></p>
+<ul>
+<li><strong>6、 工程目录</strong><br><img src="https://wx2.sinaimg.cn/large/72ebc0edgy1fxtcptdmsrj20bu08imxq.jpg" alt="image"></li>
+</ul>
+<h2 id="二、iOS集成"><a href="#二、iOS集成" class="headerlink" title="二、iOS集成"></a>二、iOS集成</h2><blockquote>
+<p><strong>注意：</strong>此处默认本机cocoapods已安装完成，未安装的可先google对应教程安装。参考：<a href="https://www.jianshu.com/p/f43b5964f582" target="_blank" rel="noopener">CocoaPods安装方法</a></p>
+</blockquote>
+<ul>
+<li><strong>1、 在<code>\ios</code>根目录下，终端执行<code>pod init</code>，生成<code>Podfile</code>文件；</strong></li>
+<li><strong>2、 编辑<code>Podfile</code>文件，可参考如下配置：</strong></li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br></pre></td><td class="code"><pre><span class="line"> <span class="comment"># Uncomment the next line to define a global platform for your project</span></span><br><span class="line"> platform :ios, <span class="string">'9.0'</span></span><br><span class="line">target <span class="string">'MyReactNativeApp'</span> <span class="keyword">do</span></span><br><span class="line">  <span class="comment"># Uncomment the next line if you're using Swift or would like to use dynamic frameworks</span></span><br><span class="line">  <span class="comment"># use_frameworks!</span></span><br><span class="line"></span><br><span class="line">  <span class="comment"># Pods for MyReactNativeApp</span></span><br><span class="line"></span><br><span class="line">  <span class="comment"># 'node_modules'目录一般位于根目录中</span></span><br><span class="line">  <span class="comment"># 但是如果你的结构不同，那你就要根据实际路径修改下面的`:path`</span></span><br><span class="line">  pod <span class="string">'React'</span>, :path =&gt; <span class="string">'../node_modules/react-native'</span>, :subspecs =&gt; [</span><br><span class="line">    <span class="string">'Core'</span>,</span><br><span class="line">    <span class="string">'CxxBridge'</span>, <span class="comment"># 如果RN版本 &gt;= 0.47则加入此行</span></span><br><span class="line">    <span class="string">'DevSupport'</span>, <span class="comment"># 如果RN版本 &gt;= 0.43，则需要加入此行才能开启开发者菜单</span></span><br><span class="line">    <span class="string">'RCTText'</span>,</span><br><span class="line">    <span class="string">'RCTNetwork'</span>,</span><br><span class="line">    <span class="string">'RCTWebSocket'</span>, <span class="comment"># 调试功能需要此模块</span></span><br><span class="line">    <span class="string">'RCTAnimation'</span>, <span class="comment"># FlatList和原生动画功能需要此模块</span></span><br><span class="line">    <span class="comment"># 在这里继续添加你所需要的其他RN模块</span></span><br><span class="line">    <span class="string">'RCTActionSheet'</span>,</span><br><span class="line">    <span class="string">'RCTBlob'</span>,</span><br><span class="line">    <span class="string">'RCTGeolocation'</span>,</span><br><span class="line">    <span class="string">'RCTImage'</span>,</span><br><span class="line">    <span class="string">'RCTSettings'</span>,</span><br><span class="line">    <span class="string">'RCTVibration'</span>,</span><br><span class="line">    <span class="string">'RCTLinkingIOS'</span>,</span><br><span class="line"></span><br><span class="line">  ]</span><br><span class="line">  <span class="comment"># 如果你的RN版本 &gt;= 0.42.0，则加入下面这行</span></span><br><span class="line">  pod <span class="string">'yoga'</span>, :path =&gt; <span class="string">'../node_modules/react-native/ReactCommon/yoga'</span></span><br><span class="line"></span><br><span class="line">  <span class="comment"># 如果RN版本 &gt;= 0.45则加入下面三个第三方编译依赖</span></span><br><span class="line">  pod <span class="string">'DoubleConversion'</span>, :podspec =&gt; <span class="string">'../node_modules/react-native/third-party-podspecs/DoubleConversion.podspec'</span></span><br><span class="line">  pod <span class="string">'glog'</span>, :podspec =&gt; <span class="string">'../node_modules/react-native/third-party-podspecs/glog.podspec'</span></span><br><span class="line">  pod <span class="string">'Folly'</span>, :podspec =&gt; <span class="string">'../node_modules/react-native/third-party-podspecs/Folly.podspec'</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">  target <span class="string">'MyReactNativeAppTests'</span> <span class="keyword">do</span></span><br><span class="line">    inherit! :search_paths</span><br><span class="line">    <span class="comment"># Pods for testing</span></span><br><span class="line">  end</span><br><span class="line"></span><br><span class="line">  target <span class="string">'MyReactNativeAppUITests'</span> <span class="keyword">do</span></span><br><span class="line">    inherit! :search_paths</span><br><span class="line">    <span class="comment"># Pods for testing</span></span><br><span class="line">  end</span><br><span class="line"></span><br><span class="line">end</span><br></pre></td></tr></table></figure>
+<ul>
+<li><strong>3、 执行<code>pod install</code>；</strong></li>
+<li><strong>4、 工程根目录下创建<code>index.js</code></strong></li>
+</ul>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> React, &#123;Component&#125; <span class="keyword">from</span> <span class="string">'react'</span>;</span><br><span class="line"><span class="keyword">import</span> &#123;</span><br><span class="line">	AppRegistry,</span><br><span class="line">	StyleSheet,</span><br><span class="line">	View,</span><br><span class="line">	Text,</span><br><span class="line">&#125; <span class="keyword">from</span> <span class="string">'react-native'</span>;</span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">index</span> <span class="keyword">extends</span> <span class="title">Component</span> </span>&#123;</span><br><span class="line">	render() &#123;</span><br><span class="line">		<span class="keyword">return</span> (</span><br><span class="line">			&lt;View style=&#123;styles.container&#125;&gt;</span><br><span class="line">				&lt;Text style=&#123;&#123;<span class="attr">fontSize</span>:<span class="number">20</span>&#125;&#125;&gt;我是ReactNative !&lt;/Text&gt;</span><br><span class="line">			&lt;<span class="regexp">/View&gt;</span></span><br><span class="line"><span class="regexp">		);</span></span><br><span class="line"><span class="regexp">	&#125;</span></span><br><span class="line"><span class="regexp">&#125;</span></span><br><span class="line"><span class="regexp">const styles = StyleSheet.create(&#123;</span></span><br><span class="line"><span class="regexp">	container:&#123;</span></span><br><span class="line"><span class="regexp">		flex:1,</span></span><br><span class="line"><span class="regexp">		backgroundColor:'green',</span></span><br><span class="line"><span class="regexp">		justifyContent:'center',</span></span><br><span class="line"><span class="regexp">		alignItems:'center'</span></span><br><span class="line"><span class="regexp">	&#125;</span></span><br><span class="line"><span class="regexp">&#125;);</span></span><br><span class="line"><span class="regexp"></span></span><br><span class="line"><span class="regexp">AppRegistry.registerComponent("MyReactNativeApp", () =&gt; index);</span></span><br></pre></td></tr></table></figure>
+<ul>
+<li><strong>5、 在原生项目中测试：</strong></li>
+</ul>
+<p>在需要跳转的ViewController：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">#import &lt;React/RCTRootView.h&gt;</span><br><span class="line">#import &lt;React/RCTBundleURLProvider.h&gt;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">- (void)pushToReactNativeVc &#123;</span><br><span class="line">	NSURL *jsBundleLocation = [[RCTBundleURLProvider sharedSettings] jsBundleURLForBundleRoot:@&quot;index&quot; fallbackResource:nil];</span><br><span class="line">    RCTRootView *rootView = [[RCTRootView alloc] initWithBundleURL:jsBundleLocation moduleName:@&quot;MyReactNativeApp&quot; initialProperties:nil launchOptions:nil];</span><br><span class="line">    </span><br><span class="line">    UIViewController *vc = [[UIViewController alloc] init];</span><br><span class="line">    vc.view = rootView;</span><br><span class="line">    [self.navigationController pushViewController:vc animated:YES];</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><strong>Tips：</strong>如果遇到 如下错误<br><img src="https://wx1.sinaimg.cn/large/72ebc0edgy1fxtc7evml1j22jk1564qr.jpg" alt="image"><br>打开Build Phases→Link Binary With Libraries点击 + ,然后添加如下的<code>.a</code>静态库<br><img src="https://wx4.sinaimg.cn/large/72ebc0edgy1fxtc8j521fj20mo0pygvg.jpg" alt="image"></p>
+<h2 id="三、Android集成"><a href="#三、Android集成" class="headerlink" title="三、Android集成"></a>三、Android集成</h2><h4 id="3-1-配置Gradle"><a href="#3-1-配置Gradle" class="headerlink" title="3.1 配置Gradle"></a>3.1 配置Gradle</h4><blockquote>
+<p>1、Maven是基于项目对象模型(POM project object model)，可以通过一小段描述信息（配置）来管理项目的构建，报告和文档的软件项目管理工具。Maven的核心功能便是合理叙述项目间的依赖关系，通俗点讲，就是通过pom.xml文件的配置获取jar包，而不用手动去添加jar包；<br>2、Gradle抛弃了传统基于XML（如Ant和Maven）的各种繁琐配置，使用了基于Groovy的领域特定语言（DSL）来声明项目配置。<br>3、Gradle兼容Maven仓库。</p>
+</blockquote>
+<h5 id="3-1-1-在app-中-build-gradle-文件中添加-React-Native-依赖"><a href="#3-1-1-在app-中-build-gradle-文件中添加-React-Native-依赖" class="headerlink" title="3.1.1 在app 中 build.gradle 文件中添加 React Native 依赖"></a>3.1.1 在app 中 build.gradle 文件中添加 React Native 依赖</h5><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">dependencies &#123;</span><br><span class="line">    implementation <span class="string">'com.android.support:appcompat-v7:23.0.1'</span></span><br><span class="line">    ...</span><br><span class="line">    implementation <span class="string">"com.facebook.react:react-native:+"</span> <span class="comment">// From node_modules</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>如果想要指定特定的 React Native 版本，可以用具体的版本号替换 +，当然前提是你从 npm 里下载的是这个版本。</p>
+</blockquote>
+<h5 id="3-1-2-在项目的-build-gradle-文件中为-React-Native-添加一个-maven-依赖的入口，必须写在-“allprojects”-代码块中"><a href="#3-1-2-在项目的-build-gradle-文件中为-React-Native-添加一个-maven-依赖的入口，必须写在-“allprojects”-代码块中" class="headerlink" title="3.1.2 在项目的 build.gradle 文件中为 React Native 添加一个 maven 依赖的入口，必须写在 “allprojects” 代码块中:"></a>3.1.2 在项目的 build.gradle 文件中为 React Native 添加一个 maven 依赖的入口，必须写在 “allprojects” 代码块中:</h5><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">allprojects &#123;</span><br><span class="line">    repositories &#123;</span><br><span class="line">        maven &#123;</span><br><span class="line">            <span class="comment">// All of React Native (JS, Android binaries) is installed from npm</span></span><br><span class="line">            url <span class="string">"$rootDir/../node_modules/react-native/android"</span></span><br><span class="line">        &#125;</span><br><span class="line">        ...</span><br><span class="line">    &#125;</span><br><span class="line">    ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>确保依赖路径的正确！以免在 Android Studio 运行 Gradle 同步构建时抛出 “Failed to resolve: com.facebook.react:react-native:0.x.x” 异常。</p>
+</blockquote>
+<h4 id="3-2-配置权限"><a href="#3-2-配置权限" class="headerlink" title="3.2 配置权限"></a>3.2 配置权限</h4><h5 id="3-2-1-在-AndroidManifest-xml-清单文件中声明网络权限"><a href="#3-2-1-在-AndroidManifest-xml-清单文件中声明网络权限" class="headerlink" title="3.2.1 在 AndroidManifest.xml 清单文件中声明网络权限:"></a>3.2.1 在 AndroidManifest.xml 清单文件中声明网络权限:</h5><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&lt;uses-permission android:name=<span class="string">"android.permission.INTERNET"</span> /&gt;</span><br></pre></td></tr></table></figure>
+<h5 id="3-2-2-如果需要访问-DevSettingsActivity-界面（即开发者菜单），则还需要在-AndroidManifest-xml-中声明"><a href="#3-2-2-如果需要访问-DevSettingsActivity-界面（即开发者菜单），则还需要在-AndroidManifest-xml-中声明" class="headerlink" title="3.2.2 如果需要访问 DevSettingsActivity 界面（即开发者菜单），则还需要在 AndroidManifest.xml 中声明:"></a>3.2.2 如果需要访问 DevSettingsActivity 界面（即开发者菜单），则还需要在 AndroidManifest.xml 中声明:</h5><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&lt;activity android:name=<span class="string">"com.facebook.react.devsupport.DevSettingsActivity"</span> /&gt;</span><br></pre></td></tr></table></figure>
+<h5 id="3-2-3-修改abiFilters"><a href="#3-2-3-修改abiFilters" class="headerlink" title="3.2.3 修改abiFilters"></a>3.2.3 修改abiFilters</h5><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">ndk &#123;</span><br><span class="line">       abiFilters <span class="string">"armeabi-v7a"</span>, <span class="string">"x86"</span></span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+<p><strong>原因</strong></p>
+<p>react-native生成aar的源码在npm install命令下载生成的<br><code>&#39;$项目根目录&#39;\node_modules\react-native\ReactAndroid</code>中；<br>aar中关于对于CPU限制在<br><code>&#39;$项目根目录&#39;\node_modules\react-native\ReactAndroid\src\main\jni\Application.mk</code> ,<br>在这个文件中，我们可以到：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">APP_BUILD_SCRIPT := Android.mk</span><br><span class="line"></span><br><span class="line">APP_ABI := armeabi-v7a x86</span><br><span class="line">APP_PLATFORM := android-16</span><br><span class="line"></span><br><span class="line">APP_MK_DIR := $(dir $(lastword $(MAKEFILE_LIST)))</span><br><span class="line"></span><br><span class="line">NDK_MODULE_PATH := $(APP_MK_DIR)$(HOST_DIRSEP)$(THIRD_PARTY_NDK_DIR)$(HOST_DIRSEP)$(REACT_COMMON_DIR)$(HOST_DIRSEP)$(APP_MK_DIR)first-party</span><br><span class="line"></span><br><span class="line">APP_STL := gnustl_shared</span><br><span class="line"></span><br><span class="line"><span class="comment"># Make sure every shared lib includes a .note.gnu.build-id header</span></span><br><span class="line">APP_CFLAGS := -Wall -Werror</span><br><span class="line">APP_CPPFLAGS := -std=c++1y</span><br><span class="line">APP_LDFLAGS := -Wl,--build-id</span><br><span class="line"></span><br><span class="line">NDK_TOOLCHAIN_VERSION := 4.9</span><br></pre></td></tr></table></figure>
+<p>说明了CPU的类型限定在了<code>armeabi-v7a</code>和<code>x86</code>上</p>
+<h4 id="3-3-加载ReactNative视图"><a href="#3-3-加载ReactNative视图" class="headerlink" title="3.3 加载ReactNative视图"></a>3.3 加载ReactNative视图</h4><h5 id="方式一、继承ReactActivity"><a href="#方式一、继承ReactActivity" class="headerlink" title="方式一、继承ReactActivity"></a>方式一、继承ReactActivity</h5><ul>
+<li><strong>需要使用RN的页面继承<code>ReactActivity</code></strong></li>
+</ul>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> com.facebook.react.ReactActivity;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">MainActivity</span> <span class="keyword">extends</span> <span class="title">ReactActivity</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * Returns the name of the main component registered from JavaScript.</span></span><br><span class="line"><span class="comment">     * This is used to schedule rendering of the component.</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">protected</span> String <span class="title">getMainComponentName</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="string">"MyReactNativeApp"</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<ul>
+<li><strong><code>Application</code>中实现<code>ReactApplication</code>的方法，如下：</strong></li>
+</ul>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> ReactNativeHost <span class="title">getReactNativeHost</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> reactNativeHost;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">private</span> <span class="keyword">final</span> ReactNativeHost reactNativeHost = <span class="keyword">new</span> ReactNativeHost(<span class="keyword">this</span>) &#123;</span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">getUseDeveloperSupport</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> BuildConfig.DEBUG;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">protected</span> List&lt;ReactPackage&gt; <span class="title">getPackages</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> Arrays.&lt;ReactPackage&gt;asList(</span><br><span class="line">                <span class="keyword">new</span> MainReactPackage()</span><br><span class="line">        );</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">protected</span> String <span class="title">getJSMainModuleName</span><span class="params">()</span></span>&#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="string">"index"</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<h5 id="方式二、在布局中加入ReactRootView，通过-ReactInstanceManager加载管理JS"><a href="#方式二、在布局中加入ReactRootView，通过-ReactInstanceManager加载管理JS" class="headerlink" title="方式二、在布局中加入ReactRootView，通过 ReactInstanceManager加载管理JS"></a>方式二、在布局中加入ReactRootView，通过 ReactInstanceManager加载管理JS</h5><ul>
+<li><p><strong>1、配置权限以便开发中的红屏错误能正确显示</strong></p>
+<p>如果你的应用会运行在 Android 6.0（API level 23）或更高版本，请确保你在开发版本中有打开悬浮窗(overlay)权限。你可以在代码中使用Settings.canDrawOverlays(this);来检查。之所以需要这一权限，是因为我们会把开发中的报错显示在悬浮窗中（仅在开发阶段需要）。在 Android 6.0（API level 23）中用户需要手动同意授权。具体请求授权的做法是在onCreate()中添加如下代码。其中OVERLAY_PERMISSION_REQ_CODE是用于回传授权结果的字段。</p>
+</li>
+</ul>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">private</span> <span class="keyword">final</span> <span class="keyword">int</span> OVERLAY_PERMISSION_REQ_CODE = <span class="number">1</span>;  <span class="comment">// 任写一个值</span></span><br><span class="line"></span><br><span class="line">...</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> (Build.VERSION.SDK_INT &gt;= Build.VERSION_CODES.M) &#123;</span><br><span class="line">    <span class="keyword">if</span> (!Settings.canDrawOverlays(<span class="keyword">this</span>)) &#123;</span><br><span class="line">        Intent intent = <span class="keyword">new</span> Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION,</span><br><span class="line">                                   Uri.parse(<span class="string">"package:"</span> + getPackageName()));</span><br><span class="line">        startActivityForResult(intent, OVERLAY_PERMISSION_REQ_CODE);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>重写<code>onActivityResult()</code>方法</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Override</span></span><br><span class="line"><span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">onActivityResult</span><span class="params">(<span class="keyword">int</span> requestCode, <span class="keyword">int</span> resultCode, Intent data)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (requestCode == OVERLAY_PERMISSION_REQ_CODE) &#123;</span><br><span class="line">        <span class="keyword">if</span> (Build.VERSION.SDK_INT &gt;= Build.VERSION_CODES.M) &#123;</span><br><span class="line">            <span class="keyword">if</span> (!Settings.canDrawOverlays(<span class="keyword">this</span>)) &#123;</span><br><span class="line">                <span class="comment">// SYSTEM_ALERT_WINDOW permission not granted</span></span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<ul>
+<li><strong>接下来添加一些原生代码来启动 React Native 的运行时环境并让它开始渲染。首先需要在一个Activity中创建一个ReactRootView对象，然后在这个对象之中启动 React Native 应用，并将它设为界面的主视图。</strong></li>
+</ul>
+<blockquote>
+<p>如果你想在安卓 5.0 以下的系统上运行，请用 <code>com.android.support:appcompat</code> 包中的 <code>AppCompatActivity</code> 代替 <code>Activity</code> 。</p>
+</blockquote>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">MyReactActivity</span> <span class="keyword">extends</span> <span class="title">Activity</span> <span class="keyword">implements</span> <span class="title">DefaultHardwareBackBtnHandler</span> </span>&#123;</span><br><span class="line">    <span class="keyword">private</span> ReactRootView mReactRootView;</span><br><span class="line">    <span class="keyword">private</span> ReactInstanceManager mReactInstanceManager;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">onCreate</span><span class="params">(Bundle savedInstanceState)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">super</span>.onCreate(savedInstanceState);</span><br><span class="line"></span><br><span class="line">        mReactRootView = <span class="keyword">new</span> ReactRootView(<span class="keyword">this</span>);</span><br><span class="line">        mReactInstanceManager = ReactInstanceManager.builder()</span><br><span class="line">                .setApplication(getApplication())</span><br><span class="line">                .setBundleAssetName(<span class="string">"index.android.bundle"</span>)</span><br><span class="line">                .setJSMainModulePath(<span class="string">"index"</span>)</span><br><span class="line">                .addPackage(<span class="keyword">new</span> MainReactPackage())</span><br><span class="line">                .setUseDeveloperSupport(BuildConfig.DEBUG)</span><br><span class="line">                .setInitialLifecycleState(LifecycleState.RESUMED)</span><br><span class="line">                .build();</span><br><span class="line">        <span class="comment">// 注意这里的MyReactNativeApp必须对应“index.js”中的</span></span><br><span class="line">        <span class="comment">// “AppRegistry.registerComponent()”的第一个参数</span></span><br><span class="line">       mReactRootView.startReactApplication(mReactInstanceManager, <span class="string">"MyReactNativeApp"</span>, <span class="keyword">null</span>);</span><br><span class="line">        setContentView(mReactRootView);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">invokeDefaultOnBackPressed</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">super</span>.onBackPressed();</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    </span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onBackPressed</span><span class="params">()</span> </span>&#123;</span><br><span class="line">	    <span class="keyword">if</span> (mReactInstanceManager != <span class="keyword">null</span>) &#123;</span><br><span class="line">	        mReactInstanceManager.onBackPressed();</span><br><span class="line">	    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">	        <span class="keyword">super</span>.onBackPressed();</span><br><span class="line">	    &#125;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<ul>
+<li><strong>生命周期</strong></li>
+</ul>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="meta">@Override</span></span><br><span class="line"><span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">onPause</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="keyword">super</span>.onPause();</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (mReactInstanceManager != <span class="keyword">null</span>) &#123;</span><br><span class="line">        mReactInstanceManager.onHostPause(<span class="keyword">this</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="meta">@Override</span></span><br><span class="line"><span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">onResume</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="keyword">super</span>.onResume();</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (mReactInstanceManager != <span class="keyword">null</span>) &#123;</span><br><span class="line">        mReactInstanceManager.onHostResume(<span class="keyword">this</span>, <span class="keyword">this</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="meta">@Override</span></span><br><span class="line"><span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">onDestroy</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="keyword">super</span>.onDestroy();</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (mReactInstanceManager != <span class="keyword">null</span>) &#123;</span><br><span class="line">        mReactInstanceManager.onHostDestroy(<span class="keyword">this</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">if</span> (mReactRootView != <span class="keyword">null</span>) &#123;</span><br><span class="line">        mReactRootView.unmountReactApplication();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<ul>
+<li><strong>弹出RN的开发者菜单</strong></li>
+</ul>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">onKeyUp</span><span class="params">(<span class="keyword">int</span> keyCode, KeyEvent event)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (keyCode == KeyEvent.KEYCODE_MENU &amp;&amp; mReactInstanceManager != <span class="keyword">null</span>) &#123;</span><br><span class="line">            mReactInstanceManager.showDevOptionsDialog();</span><br><span class="line">            <span class="keyword">return</span> <span class="keyword">true</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">super</span>.onKeyUp(keyCode, event);</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+<h4 id="3-4-Android相关报错处理"><a href="#3-4-Android相关报错处理" class="headerlink" title="3.4 Android相关报错处理"></a>3.4 Android相关报错处理</h4><ul>
+<li>1、so库冲突<br><img src="https://ws4.sinaimg.cn/large/72ebc0edgy1fxtcdi9palj21je0eg3zj.jpg" alt="image"></li>
+</ul>
+<blockquote>
+<p>处理：在app下的build.gride中添加如下设置</p>
+</blockquote>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">packagingOptions &#123;</span><br><span class="line">        pickFirst <span class="string">'lib/x86/libgnustl_shared.so'</span></span><br><span class="line">        pickFirst <span class="string">'lib/armeabi-v7a/libgnustl_shared.so'</span></span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+
+            
+
+        </div>
+    </div>
+    <div id="post-footer" class="post-footer main-content-wrap">
+        
+            <div class="post-footer-tags">
+                <span class="text-color-light text-small">标签</span><br/>
+                
+    <a class="tag tag--primary tag--small t-link" href="/tags/ReactNative/">ReactNative</a>
+
+            </div>
+        
+        
+            <div class="post-actions-wrap">
+    <nav>
+        <ul class="post-actions post-action-nav">
+            <li class="post-action">
+                
+                    
+                    <a class="post-action-btn btn btn--default tooltip--top" href="/2018/12/18/ReactNative/ReactNative与Android的交互/" data-tooltip="ReactNative与Android的交互" aria-label="上一篇: ReactNative与Android的交互">
+                
+                    <i class="fa fa-angle-left" aria-hidden="true"></i>
+                    <span class="hide-xs hide-sm text-small icon-ml">上一篇</span>
+                </a>
+            </li>
+            <li class="post-action">
+                
+                    
+                    <a class="post-action-btn btn btn--default tooltip--top" href="/2018/10/11/ReactNative/ReactNative触摸事件/" data-tooltip="ReactNative触摸事件" aria-label="下一篇: ReactNative触摸事件">
+                
+                    <span class="hide-xs hide-sm text-small icon-mr">下一篇</span>
+                    <i class="fa fa-angle-right" aria-hidden="true"></i>
+                </a>
+            </li>
+        </ul>
+    </nav>
+    <ul class="post-actions post-action-share">
+        <li class="post-action hide-lg hide-md hide-sm">
+            <a class="post-action-btn btn btn--default btn-open-shareoptions" href="#btn-open-shareoptions" aria-label="Diesen Beitrag teilen">
+                <i class="fa fa-share-alt" aria-hidden="true"></i>
+            </a>
+        </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a class="post-action-btn btn btn--default" target="new" href="https://www.facebook.com/sharer/sharer.php?u=http://yoursite.com/2018/11/26/ReactNative/ReactNative集成到原生项目/" title="分享到 Facebook">
+                    <i class="fab fa-facebook" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a class="post-action-btn btn btn--default" target="new" href="https://twitter.com/intent/tweet?text=http://yoursite.com/2018/11/26/ReactNative/ReactNative集成到原生项目/" title="分享到 Twitter">
+                    <i class="fab fa-twitter" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a class="post-action-btn btn btn--default" target="new" href="https://plus.google.com/share?url=http://yoursite.com/2018/11/26/ReactNative/ReactNative集成到原生项目/" title="分享到 Google+">
+                    <i class="fab fa-google-plus" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+        
+            
+                <li class="post-action">
+                    <a class="post-action-btn btn btn--default" href="#disqus_thread">
+                        <i class="fa fa-comment"></i>
+                    </a>
+                </li>
+            
+        
+        <li class="post-action">
+            
+                <a class="post-action-btn btn btn--default" href="#" aria-label="Nach oben">
+            
+                <i class="fa fa-list" aria-hidden="true"></i>
+            </a>
+        </li>
+    </ul>
+</div>
+
+
+        
+        
+            
+                <div id="disqus_thread">
+    <noscript>Please enable JavaScript to view the <a href="//disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+            
+        
+    </div>
+</article>
+
+
+
+                <footer id="footer" class="main-content-wrap">
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js">
+</script>
+    <span class="copyrights">
+        Copyrights &copy; 2018 BulldogX. All Rights Reserved.
+    </span>
+    <span id="busuanzi_container_site_uv">
+  您是本站第<span id="busuanzi_value_site_uv"></span>位访问者
+</span>
+</footer>
+
+            </div>
+            
+                <div id="bottom-bar" class="post-bottom-bar" data-behavior="2">
+                    <div class="post-actions-wrap">
+    <nav>
+        <ul class="post-actions post-action-nav">
+            <li class="post-action">
+                
+                    
+                    <a class="post-action-btn btn btn--default tooltip--top" href="/2018/12/18/ReactNative/ReactNative与Android的交互/" data-tooltip="ReactNative与Android的交互" aria-label="上一篇: ReactNative与Android的交互">
+                
+                    <i class="fa fa-angle-left" aria-hidden="true"></i>
+                    <span class="hide-xs hide-sm text-small icon-ml">上一篇</span>
+                </a>
+            </li>
+            <li class="post-action">
+                
+                    
+                    <a class="post-action-btn btn btn--default tooltip--top" href="/2018/10/11/ReactNative/ReactNative触摸事件/" data-tooltip="ReactNative触摸事件" aria-label="下一篇: ReactNative触摸事件">
+                
+                    <span class="hide-xs hide-sm text-small icon-mr">下一篇</span>
+                    <i class="fa fa-angle-right" aria-hidden="true"></i>
+                </a>
+            </li>
+        </ul>
+    </nav>
+    <ul class="post-actions post-action-share">
+        <li class="post-action hide-lg hide-md hide-sm">
+            <a class="post-action-btn btn btn--default btn-open-shareoptions" href="#btn-open-shareoptions" aria-label="Diesen Beitrag teilen">
+                <i class="fa fa-share-alt" aria-hidden="true"></i>
+            </a>
+        </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a class="post-action-btn btn btn--default" target="new" href="https://www.facebook.com/sharer/sharer.php?u=http://yoursite.com/2018/11/26/ReactNative/ReactNative集成到原生项目/" title="分享到 Facebook">
+                    <i class="fab fa-facebook" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a class="post-action-btn btn btn--default" target="new" href="https://twitter.com/intent/tweet?text=http://yoursite.com/2018/11/26/ReactNative/ReactNative集成到原生项目/" title="分享到 Twitter">
+                    <i class="fab fa-twitter" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a class="post-action-btn btn btn--default" target="new" href="https://plus.google.com/share?url=http://yoursite.com/2018/11/26/ReactNative/ReactNative集成到原生项目/" title="分享到 Google+">
+                    <i class="fab fa-google-plus" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+        
+            
+                <li class="post-action">
+                    <a class="post-action-btn btn btn--default" href="#disqus_thread">
+                        <i class="fa fa-comment"></i>
+                    </a>
+                </li>
+            
+        
+        <li class="post-action">
+            
+                <a class="post-action-btn btn btn--default" href="#" aria-label="Nach oben">
+            
+                <i class="fa fa-list" aria-hidden="true"></i>
+            </a>
+        </li>
+    </ul>
+</div>
+
+
+                </div>
+                <div id="share-options-bar" class="share-options-bar" data-behavior="2">
+    <i id="btn-close-shareoptions" class="fa fa-times"></i>
+    <ul class="share-options">
+        
+            
+            
+            <li class="share-option">
+                <a class="share-option-btn" target="new" href="https://www.facebook.com/sharer/sharer.php?u=http://yoursite.com/2018/11/26/ReactNative/ReactNative集成到原生项目/">
+                    <i class="fab fa-facebook" aria-hidden="true"></i><span>分享到 Facebook</span>
+                </a>
+            </li>
+        
+            
+            
+            <li class="share-option">
+                <a class="share-option-btn" target="new" href="https://twitter.com/intent/tweet?text=http://yoursite.com/2018/11/26/ReactNative/ReactNative集成到原生项目/">
+                    <i class="fab fa-twitter" aria-hidden="true"></i><span>分享到 Twitter</span>
+                </a>
+            </li>
+        
+            
+            
+            <li class="share-option">
+                <a class="share-option-btn" target="new" href="https://plus.google.com/share?url=http://yoursite.com/2018/11/26/ReactNative/ReactNative集成到原生项目/">
+                    <i class="fab fa-google-plus" aria-hidden="true"></i><span>分享到 Google+</span>
+                </a>
+            </li>
+        
+    </ul>
+</div>
+
+            
+        </div>
+        
+
+
+    
+        
+    
+
+<div id="about">
+    <div id="about-card">
+        <div id="about-btn-close">
+            <i class="fa fa-times"></i>
+        </div>
+        
+            <img id="about-card-picture" src="/assets/images/Avatar_icefrog.jpg" alt="作者的图片"/>
+        
+            <h4 id="about-card-name">BulldogX</h4>
+        
+            <div id="about-card-bio"><p style='color:red'>国家一级抬杠运动员</p></div>
+        
+        
+            <div id="about-card-job">
+                <i class="fa fa-briefcase"></i>
+                <br/>
+                <p>APP开发工程师</p>
+
+            </div>
+        
+        
+            <div id="about-card-location">
+                <i class="fa fa-map-marker-alt"></i>
+                <br/>
+                ShangHai
+            </div>
+        
+    </div>
+</div>
+
+        
+        
+<div id="cover" style="background-image:url('/assets/images/cover.jpg');"></div>
+        <!--SCRIPTS-->
+<script src="/assets/js/script-vufjrm3fmbuttogo1hxuu0w9w0sesk5iyysjuguc2hdhufot9szxg8twijry.min.js"></script>
+<!--SCRIPTS END-->
+
+    
+        <script>
+             var disqus_config = function () {
+                 this.page.url = 'http://yoursite.com/2018/11/26/ReactNative/ReactNative集成到原生项目/';
+                 
+                    this.page.identifier = '2018/11/26/ReactNative/ReactNative集成到原生项目/';
+                 
+             };
+            (function() {
+                var d = document, s = d.createElement('script');
+                var disqus_shortname = 'bulldogx';
+                s.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+
+                s.setAttribute('data-timestamp', +new Date());
+                (d.head || d.body).appendChild(s);
+            })();
+        </script>
+    
+
+
+
+    </body>
+</html>

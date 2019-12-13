@@ -1,0 +1,768 @@
+
+<!DOCTYPE HTML>
+<html lang="zh-hans" >
+    <head>
+        <meta charset="UTF-8">
+        <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
+        <title>ReactNative与Android的交互 · BulldogX's Note</title>
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta name="description" content="">
+        <meta name="generator" content="GitBook 3.2.3">
+        
+        
+        
+    
+    <link rel="stylesheet" href="../../gitbook/style.css">
+
+    
+            
+                
+                <link rel="stylesheet" href="../../gitbook/gitbook-plugin-search-pro/search.css">
+                
+            
+                
+                <link rel="stylesheet" href="../../gitbook/gitbook-plugin-splitter/splitter.css">
+                
+            
+                
+                <link rel="stylesheet" href="../../gitbook/gitbook-plugin-tbfed-pagefooter/footer.css">
+                
+            
+                
+                <link rel="stylesheet" href="../../gitbook/gitbook-plugin-chapter-fold/chapter-fold.css">
+                
+            
+                
+                <link rel="stylesheet" href="../../gitbook/gitbook-plugin-code/plugin.css">
+                
+            
+                
+                <link rel="stylesheet" href="../../gitbook/gitbook-plugin-anchor-navigation-ex/style/plugin.css">
+                
+            
+                
+                <link rel="stylesheet" href="../../gitbook/gitbook-plugin-expandable-chapters/expandable-chapters.css">
+                
+            
+                
+                <link rel="stylesheet" href="../../gitbook/gitbook-plugin-highlight/website.css">
+                
+            
+                
+                <link rel="stylesheet" href="../../gitbook/gitbook-plugin-fontsettings/website.css">
+                
+            
+        
+
+    
+
+    
+        
+        <link rel="stylesheet" href="../../styles/website.css">
+        
+    
+
+        
+    
+    
+    <meta name="HandheldFriendly" content="true"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <link rel="apple-touch-icon-precomposed" sizes="152x152" href="../../gitbook/images/apple-touch-icon-precomposed-152.png">
+    <link rel="shortcut icon" href="../../gitbook/images/favicon.ico" type="image/x-icon">
+
+    
+    <link rel="next" href="ReactNative踩坑记录.html" />
+    
+    
+    <link rel="prev" href="ReactNative与iOS的交互.html" />
+    
+
+    </head>
+    <body>
+        
+
+
+<div class="book">
+    <div class="book-summary">
+        
+            <div class="theme-code-header">
+                <a href="./" class="link">
+                    <h1 class="title">BulldogX's Note</h1>
+                </a>
+            </div>
+            
+<div id="book-search-input" role="search">
+    <input type="text" placeholder="输入并搜索" />
+</div>
+
+            
+                <nav role="navigation">
+                
+
+
+<ul class="summary">
+    
+    
+
+    
+
+    
+        
+        
+    
+        <li class="chapter " data-level="1.1" >
+            
+                <span>
+            
+                    
+                        <b>1.1.</b>
+                    
+                    iOS
+            
+                </span>
+            
+
+            
+            <ul class="articles">
+                
+    
+        <li class="chapter " data-level="1.1.1" data-path="../../">
+            
+                <a href="../../">
+            
+                    
+                        <b>1.1.1.</b>
+                    
+                    Swift中的可选类型?和隐式解析可选类型!
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.1.2" data-path="../iOS/Swiftif-let&guard-let.html">
+            
+                <a href="../iOS/Swiftif-let&guard-let.html">
+            
+                    
+                        <b>1.1.2.</b>
+                    
+                    Swift if-let & guard-let
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.1.3" data-path="../iOS/SwiftTips.html">
+            
+                <a href="../iOS/SwiftTips.html">
+            
+                    
+                        <b>1.1.3.</b>
+                    
+                    SwiftTips
+            
+                </a>
+            
+
+            
+        </li>
+    
+
+            </ul>
+            
+        </li>
+    
+
+    
+        
+        <li class="divider"></li>
+        
+        
+    
+        <li class="chapter " data-level="2.1" >
+            
+                <span>
+            
+                    
+                        <b>2.1.</b>
+                    
+                    Mac
+            
+                </span>
+            
+
+            
+            <ul class="articles">
+                
+    
+        <li class="chapter " data-level="2.1.1" data-path="../Mac/Homebrew.html">
+            
+                <a href="../Mac/Homebrew.html">
+            
+                    
+                        <b>2.1.1.</b>
+                    
+                    Homebrew
+            
+                </a>
+            
+
+            
+        </li>
+    
+
+            </ul>
+            
+        </li>
+    
+
+    
+        
+        <li class="divider"></li>
+        
+        
+    
+        <li class="chapter " data-level="3.1" >
+            
+                <span>
+            
+                    
+                        <b>3.1.</b>
+                    
+                    ReactNative
+            
+                </span>
+            
+
+            
+            <ul class="articles">
+                
+    
+        <li class="chapter " data-level="3.1.1" data-path="ReactNative常用命令.html">
+            
+                <a href="ReactNative常用命令.html">
+            
+                    
+                        <b>3.1.1.</b>
+                    
+                    ReactNative常用命令
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="3.1.2" data-path="ReactNative集成到原生项目.html">
+            
+                <a href="ReactNative集成到原生项目.html">
+            
+                    
+                        <b>3.1.2.</b>
+                    
+                    ReactNative集成到原生项目
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="3.1.3" data-path="ReactNative与iOS的交互.html">
+            
+                <a href="ReactNative与iOS的交互.html">
+            
+                    
+                        <b>3.1.3.</b>
+                    
+                    ReactNative与iOS的交互
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter active" data-level="3.1.4" data-path="ReactNative与Android的交互.html">
+            
+                <a href="ReactNative与Android的交互.html">
+            
+                    
+                        <b>3.1.4.</b>
+                    
+                    ReactNative与Android的交互
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="3.1.5" data-path="ReactNative踩坑记录.html">
+            
+                <a href="ReactNative踩坑记录.html">
+            
+                    
+                        <b>3.1.5.</b>
+                    
+                    ReactNative踩坑记录
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="3.1.6" data-path="ReactNative触摸事件.html">
+            
+                <a href="ReactNative触摸事件.html">
+            
+                    
+                        <b>3.1.6.</b>
+                    
+                    ReactNative触摸事件
+            
+                </a>
+            
+
+            
+        </li>
+    
+
+            </ul>
+            
+        </li>
+    
+
+    
+
+    <li class="divider"></li>
+
+    <li>
+        <a href="" target="_blank" class="gitbook-link">
+            作者：
+        </a>
+    </li>
+</ul>
+
+
+                </nav>
+            
+        
+    </div>
+
+    <div class="book-body">
+        
+            <div class="body-inner">
+                
+                    
+
+<div class="book-header" role="navigation">
+    
+
+    <!-- Title -->
+    <h1>
+        <i class="fa fa-circle-o-notch fa-spin"></i>
+        <a href="../.." >ReactNative与Android的交互</a>
+    </h1>
+</div>
+
+
+
+
+                    <div class="page-wrapper" tabindex="-1" role="main">
+                        <div class="page-inner">
+                            
+<div id="book-search-results">
+    <div class="search-noresults">
+    
+                                <section class="normal markdown-section">
+                                
+                                <div id="anchor-navigation-ex-navbar"><i class="fa fa-navicon"></i><ul><ul><ul><li><span class="title-icon "></span><a href="#1-rn&#x8C03;&#x7528;native&#x65B9;&#x6CD5;"><b></b>1 RN&#x8C03;&#x7528;Native&#x65B9;&#x6CD5;</a></li><li><span class="title-icon "></span><a href="#2-native&#x53D1;&#x9001;&#x901A;&#x77E5;&#x5230;rn"><b></b>2 Native&#x53D1;&#x9001;&#x901A;&#x77E5;&#x5230;RN</a></li><li><span class="title-icon "></span><a href="#4-&#x5B8C;&#x6574;demo&#xFF08;&#x5305;&#x542B;ios--android"><b></b>4 &#x5B8C;&#x6574;Demo&#xFF08;&#x5305;&#x542B;iOS &amp; Android)</a></li></ul></ul></ul></div><a href="#" id="anchorNavigationExGoTop"><i class="fa fa-arrow-up"></i></a><hr>
+<p>title: ReactNative&#x4E0E;Android&#x7684;&#x4EA4;&#x4E92;
+date: 2018-12-18 20:09:23
+categories:</p>
+<ul>
+<li>ReactNative
+tags:</li>
+<li>ReactNative</li>
+</ul>
+<hr>
+<!-- toc-->
+<h3 id="1-rn&#x8C03;&#x7528;native&#x65B9;&#x6CD5;"><a name="1-rn&#x8C03;&#x7528;native&#x65B9;&#x6CD5;" class="anchor-navigation-ex-anchor" href="#1-rn&#x8C03;&#x7528;native&#x65B9;&#x6CD5;"><i class="fa fa-link" aria-hidden="true"></i></a>1 RN&#x8C03;&#x7528;Native&#x65B9;&#x6CD5;</h3>
+<ul>
+<li>1&#x3001;&#x521B;&#x5EFA;&#x4EA4;&#x4E92;&#x7C7B;Module&#xFF0C;&#x7EE7;&#x627F;<code>ReactContextBaseJavaModule</code>&#xFF1B;</li>
+<li>2&#x3001;&#x521B;&#x5EFA;package&#xFF0C;&#x5B9E;&#x73B0;<code>ReactPackage</code>&#x7684;&#x65B9;&#x6CD5;&#xFF0C;&#x6DFB;&#x52A0;&#x6B65;&#x9AA4;1&#x521B;&#x5EFA;&#x7684;&#x4EA4;&#x4E92;&#x7C7B;Module&#x5230;package&#x5185;&#xFF1B;</li>
+<li>3&#x3001;&#x6DFB;&#x52A0;&#x521B;&#x5EFA;&#x7684;&#x81EA;&#x5B9A;&#x4E49;package&#x5230;<code>ReactNativeHost</code>&#x4E2D;&#x7684;<code>getPackages</code>&#x65B9;&#x6CD5;&#x4E2D;&#xFF0C;&#x5411;ReactNative&#x6CE8;&#x518C;&#x539F;&#x751F;&#x6A21;&#x5757;&#xFF1B;</li>
+</ul>
+<!--more-->
+<h4 id="11-&#x5BFC;&#x51FA;native&#x7AEF;&#x7684;showinfo&#x63D0;&#x793A;&#x65B9;&#x6CD5;"><a name="11-&#x5BFC;&#x51FA;native&#x7AEF;&#x7684;showinfo&#x63D0;&#x793A;&#x65B9;&#x6CD5;" class="anchor-navigation-ex-anchor" href="#11-&#x5BFC;&#x51FA;native&#x7AEF;&#x7684;showinfo&#x63D0;&#x793A;&#x65B9;&#x6CD5;"><i class="fa fa-link" aria-hidden="true"></i></a>1.1 &#x5BFC;&#x51FA;Native&#x7AEF;&#x7684;showInfo&#x63D0;&#x793A;&#x65B9;&#x6CD5;</h4>
+<p>Native&#x7AEF;&#x5BFC;&#x51FA;</p>
+<pre><code class="lang-java"><span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">RNInterractModule</span> <span class="hljs-keyword">extends</span> <span class="hljs-title">ReactContextBaseJavaModule</span> </span>{
+
+    <span class="hljs-keyword">private</span> ReactContext mReactContext;
+
+    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-title">RNInterractModule</span><span class="hljs-params">(ReactApplicationContext reactContext)</span> </span>{
+        <span class="hljs-keyword">super</span>(reactContext);
+        <span class="hljs-keyword">this</span>.mReactContext = reactContext;
+    }
+
+<span class="hljs-comment">//&#x5BFC;&#x51FA;&#x7684;&#x6A21;&#x5757;&#x540D;&#x5B57;</span>
+    <span class="hljs-meta">@Override</span> 
+    <span class="hljs-function"><span class="hljs-keyword">public</span> String <span class="hljs-title">getName</span><span class="hljs-params">()</span> </span>{
+        <span class="hljs-keyword">return</span> <span class="hljs-string">&quot;RNInterractModule&quot;</span>;
+    }
+
+    <span class="hljs-comment">//==============1&#x3001;&#x63D0;&#x793A;==============</span>
+    <span class="hljs-meta">@ReactMethod</span>
+    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title">showInfo</span><span class="hljs-params">(String info)</span></span>{
+        Toast.makeText(getReactApplicationContext(),info,Toast.LENGTH_SHORT).show();
+    }
+}
+</code></pre>
+<p>&#x6DFB;&#x52A0;Module&#x5230;&#x81EA;&#x5B9A;&#x4E49;package&#xFF1A;</p>
+<pre><code class="lang-java"><span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">RNInterractPackage</span> <span class="hljs-keyword">implements</span> <span class="hljs-title">ReactPackage</span></span>{
+    <span class="hljs-meta">@Override</span>
+    <span class="hljs-function"><span class="hljs-keyword">public</span> List&lt;NativeModule&gt; <span class="hljs-title">createNativeModules</span><span class="hljs-params">(ReactApplicationContext reactContext)</span> </span>{
+        List&lt;NativeModule&gt; modules = <span class="hljs-keyword">new</span> ArrayList&lt;&gt;();
+        modules.add(<span class="hljs-keyword">new</span> RNInterractModule(reactContext));
+        <span class="hljs-keyword">return</span> modules;
+    }
+
+    <span class="hljs-meta">@Override</span>
+    <span class="hljs-function"><span class="hljs-keyword">public</span> List&lt;ViewManager&gt; <span class="hljs-title">createViewManagers</span><span class="hljs-params">(ReactApplicationContext reactContext)</span> </span>{
+        <span class="hljs-keyword">return</span> Collections.emptyList();
+    }
+}
+</code></pre>
+<p>&#x518D;&#x6DFB;&#x52A0;package&#xFF08;&#x6B64;&#x5904;&#x5C55;&#x793A;&#x5B8C;&#x6574;&#x7684;MainApplication&#x65B9;&#x6CD5;&#xFF0C;&#x91CD;&#x5199;<code>getPackages()</code>&#x65B9;&#x6CD5;&#x4E2D;&#x6DFB;&#x52A0;&#xFF09;</p>
+<pre><code class="lang-java">
+<span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">MainApplication</span> <span class="hljs-keyword">extends</span> <span class="hljs-title">Application</span> <span class="hljs-keyword">implements</span> <span class="hljs-title">ReactApplication</span></span>{
+    <span class="hljs-meta">@Override</span>
+    <span class="hljs-function"><span class="hljs-keyword">public</span> ReactNativeHost <span class="hljs-title">getReactNativeHost</span><span class="hljs-params">()</span> </span>{
+        <span class="hljs-keyword">return</span> reactNativeHost;
+    }
+
+
+    <span class="hljs-keyword">private</span> ReactNativeHost reactNativeHost = <span class="hljs-keyword">new</span> ReactNativeHost(<span class="hljs-keyword">this</span>) {
+        <span class="hljs-meta">@Override</span>
+        <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">boolean</span> <span class="hljs-title">getUseDeveloperSupport</span><span class="hljs-params">()</span> </span>{
+            <span class="hljs-keyword">return</span> <span class="hljs-keyword">true</span>;
+        }
+
+        <span class="hljs-meta">@Override</span>
+        <span class="hljs-function"><span class="hljs-keyword">protected</span> List&lt;ReactPackage&gt; <span class="hljs-title">getPackages</span><span class="hljs-params">()</span> </span>{
+            <span class="hljs-keyword">return</span> Arrays.&lt;ReactPackage&gt;asList(
+                    <span class="hljs-keyword">new</span> MainReactPackage(),
+                    <span class="hljs-keyword">new</span> RNInterractPackage()
+            );
+        }
+
+        <span class="hljs-meta">@Override</span>
+        <span class="hljs-function"><span class="hljs-keyword">protected</span> String <span class="hljs-title">getJSMainModuleName</span><span class="hljs-params">()</span> </span>{
+            <span class="hljs-keyword">return</span> <span class="hljs-string">&quot;index&quot;</span>;
+        }
+    };
+}
+</code></pre>
+<h4 id="12-rn&#x7AEF;&#x8C03;&#x7528;&#x5BFC;&#x51FA;&#x7684;showinfo&#x65B9;&#x6CD5;&#xFF1A;"><a name="12-rn&#x7AEF;&#x8C03;&#x7528;&#x5BFC;&#x51FA;&#x7684;showinfo&#x65B9;&#x6CD5;&#xFF1A;" class="anchor-navigation-ex-anchor" href="#12-rn&#x7AEF;&#x8C03;&#x7528;&#x5BFC;&#x51FA;&#x7684;showinfo&#x65B9;&#x6CD5;&#xFF1A;"><i class="fa fa-link" aria-hidden="true"></i></a>1.2 RN&#x7AEF;&#x8C03;&#x7528;&#x5BFC;&#x51FA;&#x7684;showInfo&#x65B9;&#x6CD5;&#xFF1A;</h4>
+<p>&#x6211;&#x4EEC;&#x5728;RN&#x7AEF;&#x628A;Native&#x7684;&#x65B9;&#x6CD5;&#x901A;&#x8FC7;&#x4E00;&#x4E2A;&#x5171;&#x540C;&#x7684;utils&#x5DE5;&#x5177;&#x7C7B;&#x5F15;&#x5165;&#xFF0C;&#x5982;&#x4E0B;</p>
+<pre><code class="lang-js">
+<span class="hljs-keyword">import</span> { NativeModules } <span class="hljs-keyword">from</span> <span class="hljs-string">&apos;react-native&apos;</span>;
+
+<span class="hljs-comment">//&#x5BFC;&#x51FA;Native&#x7AEF;&#x7684;&#x65B9;&#x6CD5;</span>
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">const</span> { showInfo} = NativeModules.RNInterractModule;
+</code></pre>
+<p>&#x5177;&#x4F53;&#x7684;RN&#x9875;&#x9762;&#x4F7F;&#x7528;&#x65F6;&#xFF1A;</p>
+<pre><code class="lang-js"><span class="hljs-keyword">import</span> { showInfo } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;../utils&quot;</span>;
+
+<span class="hljs-comment">//&#x901A;&#x8FC7;Button&#x70B9;&#x51FB;&#x4E8B;&#x4EF6;&#x89E6;&#x53D1;</span>
+&lt;Button
+    title=<span class="hljs-string">&apos;1&#x3001;&#x8C03;&#x7528;Native&#x63D0;&#x793A;&apos;</span>
+    onPress={() =&gt; showInfo(<span class="hljs-string">&apos;&#x6211;&#x662F;&#x539F;&#x751F;&#x7AEF;&#x7684;&#x63D0;&#x793A;&#xFF01;&apos;</span>)}
+/&gt;
+</code></pre>
+<p>&#x8C03;&#x7528;&#x6548;&#x679C;&#xFF1A;</p>
+<p><img src="https://wx3.sinaimg.cn/large/72ebc0edgy1fyd87qlj2fg208z0eyglv.gif" alt="image"></p>
+<h4 id="13-rn&#x56DE;&#x8C03;native"><a name="13-rn&#x56DE;&#x8C03;native" class="anchor-navigation-ex-anchor" href="#13-rn&#x56DE;&#x8C03;native"><i class="fa fa-link" aria-hidden="true"></i></a>1.3 RN&#x56DE;&#x8C03;Native</h4>
+<p>&#x6211;&#x4EEC;&#x63D0;&#x4F9B;&#x4E00;&#x4E2A;&#x4F8B;&#x5B50;&#x6765;&#x6A21;&#x62DF;&#xFF1A;&#x76EE;&#x524D;&#x7684;&#x9700;&#x6C42;&#x662F;&#x505A;&#x9762;&#x5305;&#xFF0C;RN&#x7AEF;&#x80FD;&#x63D0;&#x4F9B;&#x9762;&#x7C89;&#xFF0C;&#x4F46;&#x662F;&#x4E0D;&#x4F1A;&#x505A;&#xFF0C;Native&#x7AEF;&#x662F;&#x6709;&#x505A;&#x9762;&#x5305;&#x7684;&#x529F;&#x80FD;&#xFF1B;&#x6240;&#x4EE5;&#x6211;&#x4EEC;&#x9700;&#x8981;&#x5148;&#x628A;&#x9762;&#x7C89;&#xFF0C;&#x4F20;&#x7ED9;Native&#x7AEF;&#xFF0C;Native&#x52A0;&#x5DE5;&#x597D;&#x9762;&#x5305;&#x4E4B;&#x540E;&#xFF0C;&#x518D;&#x901A;&#x8FC7;&#x56DE;&#x8C03;&#x56DE;&#x4F20;&#x7ED9;RN&#x7AEF;&#x3002;</p>
+<p>Native&#x7AEF;&#x63D0;&#x4F9B;&#x65B9;&#x6CD5;</p>
+<pre><code class="lang-java">
+<span class="hljs-comment">// &#x6BD4;&#x5982;&#x8C03;&#x7528;&#x539F;&#x751F;&#x7684;&#x65B9;&#x6CD5;&#x5904;&#x7406;&#x56FE;&#x7247;&#x3001;&#x89C6;&#x9891;&#x4E4B;&#x7C7B;&#x7684;&#xFF0C;&#x5904;&#x7406;&#x5B8C;&#x6210;&#x4E4B;&#x540E;&#x518D;&#x628A;&#x7ED3;&#x679C;&#x56DE;&#x4F20;&#x5230;RN&#x9875;&#x9762;&#x91CC;&#x53BB;</span>
+<span class="hljs-comment">//<span class="hljs-doctag">TODO:</span> &#x8BF7;&#x52A1;&#x5FC5;&#x6CE8;&#x610F; callback &#x5E76;&#x975E;&#x5728;&#x5BF9;&#x5E94;&#x7684;&#x539F;&#x751F;&#x51FD;&#x6570;&#x8FD4;&#x56DE;&#x540E;&#x7ACB;&#x5373;&#x88AB;&#x6267;&#x884C;&#x2014;&#x2014;&#x6CE8;&#x610F;&#x8DE8;&#x8BED;&#x8A00;&#x901A;&#x8BAF;&#x662F;&#x5F02;&#x6B65;&#x7684;&#xFF0C;&#x8FD9;&#x4E2A;&#x6267;&#x884C;&#x8FC7;&#x7A0B;&#x4F1A;&#x901A;&#x8FC7;&#x6D88;&#x606F;&#x5FAA;&#x73AF;&#x6765;&#x8FDB;&#x884C;&#x3002;</span>
+<span class="hljs-meta">@ReactMethod</span>
+<span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title">patCake</span><span class="hljs-params">(String flour, Callback successCallback,Callback errorCallback)</span></span>{
+    <span class="hljs-keyword">try</span>{
+        <span class="hljs-comment">//&#x6A21;&#x62DF;&#x5F02;&#x5E38;&#xFF0C;&#x8D70;reject</span>
+        <span class="hljs-keyword">if</span> (!flour.getClass().equals(String.class)){
+            <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> Exception(<span class="hljs-string">&quot;&#x51FA;&#x9519;&#x4E86;&#xFF0C;&#x53C2;&#x6570;&#x7C7B;&#x578B;&#x4E0D;&#x5339;&#x914D;&quot;</span>);
+        }
+
+        successCallback.invoke(patCakeUse(flour));
+    }<span class="hljs-keyword">catch</span> (Exception e){
+        errorCallback.invoke(e.getMessage());
+    }
+}
+
+<span class="hljs-comment">//&#x4F7F;&#x7528;RN&#x7AEF;&#x4F20;&#x9012;&#x7684;&#x53C2;&#x6570;&#x5B57;&#x7B26;&#x4E32;&#xFF1A;&quot;&quot;&#xFF0C;&#x8C03;&#x7528;Native&#x7AEF;&#x7684;&#x505A;&#x9762;&#x5305;&#x65B9;&#x6CD5;&#xFF0C;&#x52A0;&#x5DE5;&#x6210;&#x9762;&#x5305;&#xFF0C;&#x518D;&#x56DE;&#x4F20;&#x7ED9;RN</span>
+<span class="hljs-function"><span class="hljs-keyword">private</span> String <span class="hljs-title">patCakeUse</span><span class="hljs-params">(String flour)</span></span>{
+    String cake = String.format(<span class="hljs-string">&quot;&#x4F7F;&#x7528;%s&#xFF0C;&#x505A;&#x597D;&#x4E86;:\uD83C\uDF82\uD83C\uDF5E\uD83C\uDF5E\uD83C\uDF70\uD83C\uDF70\uD83C\uDF70&quot;</span>,flour);
+    <span class="hljs-keyword">return</span> cake;
+}
+</code></pre>
+<p>RN&#x7AEF;&#x8C03;&#x7528;&#xFF1A;</p>
+<pre><code class="lang-js"><span class="hljs-comment">//&#x9996;&#x5148;&#x5DE5;&#x5177;&#x7C7B;&#x91CC;&#x5148;&#x5F15;&#x5165;</span>
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">const</span> { showInfo,patCake } = NativeModules.RNInterractModule;
+
+
+<span class="hljs-comment">//&#x5177;&#x4F53;&#x9875;&#x9762;&#x4F7F;&#x7528;</span>
+&lt;Button
+    title=<span class="hljs-string">&apos;4&#x3001;&#x56DE;&#x8C03;&#xFF1A;&#x4F7F;&#x7528;&#x9762;&#x7C89;&#x505A;&#x86CB;&#x7CD5;&apos;</span>
+    onPress={() =&gt; patCake(<span class="hljs-string">&apos;1&#x65A4;&#x9762;&#x7C89;&apos;</span>,
+        (cake) =&gt; alert(cake),
+        (error) =&gt; alert(<span class="hljs-string">&apos;&#x51FA;&#x9519;&#x4E86;&apos;</span> + error.message))}
+    /&gt;
+</code></pre>
+<p>&#x8C03;&#x7528;&#x6548;&#x679C;&#xFF1A;</p>
+<p><img src="https://ws3.sinaimg.cn/large/72ebc0edgy1fyd8axzty5g208z0ey752.gif" alt="image"></p>
+<h4 id="14-&#x4F7F;&#x7528;promise&#x56DE;&#x8C03;"><a name="14-&#x4F7F;&#x7528;promise&#x56DE;&#x8C03;" class="anchor-navigation-ex-anchor" href="#14-&#x4F7F;&#x7528;promise&#x56DE;&#x8C03;"><i class="fa fa-link" aria-hidden="true"></i></a>1.4 &#x4F7F;&#x7528;Promise&#x56DE;&#x8C03;</h4>
+<p>Native&#x7AEF;&#x63D0;&#x4F9B;&#x65B9;&#x6CD5;</p>
+<pre><code class="lang-java"><span class="hljs-meta">@ReactMethod</span>
+    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title">callNameTointroduction</span><span class="hljs-params">(String name, Promise promise)</span></span>{
+        <span class="hljs-keyword">try</span>{
+            <span class="hljs-comment">//&#x6A21;&#x62DF;&#x5F02;&#x5E38;&#xFF0C;&#x8D70;reject</span>
+            <span class="hljs-keyword">if</span> (!name.getClass().equals(String.class)){
+                <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> Exception(<span class="hljs-string">&quot;&#x51FA;&#x9519;&#x4E86;&#xFF0C;&#x53C2;&#x6570;&#x7C7B;&#x578B;&#x4E0D;&#x5339;&#x914D;&quot;</span>);
+            }
+
+            promise.resolve(introduction(name));
+        }<span class="hljs-keyword">catch</span> (Exception e){
+            promise.reject(e);
+        }
+    }
+
+    <span class="hljs-function"><span class="hljs-keyword">private</span> String <span class="hljs-title">introduction</span><span class="hljs-params">(String name)</span></span>{
+      <span class="hljs-keyword">return</span> String.format(<span class="hljs-string">&quot;&#x6211;&#x7684;&#x540D;&#x5B57;&#x53EB;%s&#xFF0C;&#x4ECA;&#x5E74;18&#x5C81;&#xFF0C;&#x559C;&#x6B22;&#x8FD0;&#x52A8;&#x3001;&#x542C;&#x6B4C;...&quot;</span>,name);
+    }
+</code></pre>
+<p>RN&#x7AEF;&#x8C03;&#x7528;&#xFF1A;</p>
+<pre><code class="lang-js"><span class="hljs-comment">//&#x9996;&#x5148;&#x5DE5;&#x5177;&#x7C7B;&#x91CC;&#x5148;&#x5F15;&#x5165;</span>
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">const</span> { showInfo,patCake, callNameTointroduction} = NativeModules.RNInterractModule;
+
+<span class="hljs-comment">//&#x5177;&#x4F53;&#x9875;&#x9762;&#x4F7F;&#x7528;</span>
+&lt;Button
+    title=<span class="hljs-string">&apos;5&#x3001;Promise&#xFF1A;&#x70B9;&#x540D;&#x81EA;&#x6211;&#x4ECB;&#x7ECD;&apos;</span>
+    onPress={
+        <span class="hljs-keyword">async</span> () =&gt; {
+            <span class="hljs-keyword">try</span> {
+                <span class="hljs-keyword">let</span> introduction = <span class="hljs-keyword">await</span> callNameTointroduction(<span class="hljs-string">&apos;&#x5C0F;&#x660E;&apos;</span>);
+                showInfo(introduction);
+            } <span class="hljs-keyword">catch</span> (e) {
+                alert(e.message);
+            }
+        }
+    }
+/&gt;
+</code></pre>
+<p>&#x8C03;&#x7528;&#x6548;&#x679C;&#xFF1A;</p>
+<p><img src="https://ws1.sinaimg.cn/large/72ebc0edgy1fyd8db2anlg208z0eyjro.gif" alt="image"></p>
+<h3 id="2-native&#x53D1;&#x9001;&#x901A;&#x77E5;&#x5230;rn"><a name="2-native&#x53D1;&#x9001;&#x901A;&#x77E5;&#x5230;rn" class="anchor-navigation-ex-anchor" href="#2-native&#x53D1;&#x9001;&#x901A;&#x77E5;&#x5230;rn"><i class="fa fa-link" aria-hidden="true"></i></a>2 Native&#x53D1;&#x9001;&#x901A;&#x77E5;&#x5230;RN</h3>
+<p>&#x5B9E;&#x73B0;&#x81EA;&#x5B9A;&#x4E49;&#x7684;&#x53D1;&#x9001;RN&#x6D88;&#x606F;&#x7C7B;<code>RNNotificationManager</code></p>
+<pre><code class="lang-java"><span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">RNNotificationManager</span> </span>{
+    <span class="hljs-comment">//&#x5B9A;&#x4E49;&#x4E0A;&#x4E0B;&#x6587;</span>
+    <span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span>  ReactContext mContext;
+
+    <span class="hljs-comment">//&#x53D1;&#x9001;&#x4E8B;&#x4EF6;&#x5230;RN&#x7AEF;</span>
+    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title">sendRNEvent</span><span class="hljs-params">(String eventName, @Nullable WritableMap params)</span></span>{
+        mContext.getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class).emit(eventName,params);
+    }
+}
+</code></pre>
+<p>&#x6211;&#x4EEC;&#x4F7F;&#x7528;&#x9759;&#x6001;&#x6210;&#x5458;&#x53D8;&#x91CF;&#x3001;&#x65B9;&#x6CD5;&#xFF0C;<code>mContext</code>&#x5728;&#x81EA;&#x5B9A;&#x4E49;&#x7684;<code>RNInterractModule</code>&#x4E3A;&#x5176;&#x8D4B;&#x503C;&#xFF1A;</p>
+<pre><code class="lang-java"><span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">RNInterractModule</span> <span class="hljs-keyword">extends</span> <span class="hljs-title">ReactContextBaseJavaModule</span> </span>{
+
+    <span class="hljs-keyword">private</span> ReactContext mReactContext;
+
+    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-title">RNInterractModule</span><span class="hljs-params">(ReactApplicationContext reactContext)</span> </span>{
+        <span class="hljs-keyword">super</span>(reactContext);
+        <span class="hljs-keyword">this</span>.mReactContext = reactContext;
+        <span class="hljs-comment">//&#x8D4B;&#x503C;</span>
+        RNNotificationManager.mContext = reactContext;
+    }
+}
+</code></pre>
+<p>&#x7136;&#x540E;&#x5C31;&#x53EF;&#x4EE5;&#x5728;&#x9700;&#x8981;&#x7ED9;RN&#x53D1;&#x9001;&#x6D88;&#x606F;&#x7684;&#x5730;&#x65B9;&#x8C03;&#x7528;&#xFF1A;</p>
+<pre><code class="lang-java">button.setOnClickListener(<span class="hljs-keyword">new</span> View.OnClickListener() {
+            <span class="hljs-meta">@Override</span>
+            <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title">onClick</span><span class="hljs-params">(View view)</span> </span>{
+                WritableMap params = Arguments.createMap();
+                params.putString(<span class="hljs-string">&quot;message&quot;</span>,<span class="hljs-string">&quot;&#x767B;&#x5F55;&#x6210;&#x529F;&quot;</span>);
+                RNNotificationManager.sendRNEvent(<span class="hljs-string">&quot;kRNNotification_Login&quot;</span>,params);
+            }
+        });
+</code></pre>
+<p>RN&#x7AEF;&#x63A5;&#x6536;&#x6D88;&#x606F;&#xFF1A;</p>
+<pre><code class="lang-js"><span class="hljs-comment">//&#x6DFB;&#x52A0;&#x76D1;&#x542C;</span>
+componentWillMount() {
+        <span class="hljs-keyword">this</span>.subscription = DeviceEventEmitter.addListener(<span class="hljs-string">&apos;kRNNotification_Login&apos;</span>,<span class="hljs-keyword">this</span>.updateLoginInfoText)
+}
+<span class="hljs-comment">//&#x79FB;&#x9664;&#x76D1;&#x542C;</span>
+componentWillUnmount() {
+    <span class="hljs-built_in">console</span>.log(<span class="hljs-string">&apos;ActivityScene---------&gt;&apos;</span>, <span class="hljs-string">&apos;&#x79FB;&#x9664;&#x901A;&#x77E5;&apos;</span>);
+    <span class="hljs-keyword">this</span>.subscription.remove();
+}
+</code></pre>
+<p>&#x8C03;&#x7528;&#x5C55;&#x793A;&#xFF1A;</p>
+<p><img src="https://wx4.sinaimg.cn/large/72ebc0edgy1fyd8o0rc48g208z0g0abu.gif" alt="image"></p>
+<h4 id="3-native&#x5411;rn&#x81EA;&#x5B9A;&#x4E49;&#x4F20;&#x53C2;"><a name="3-native&#x5411;rn&#x81EA;&#x5B9A;&#x4E49;&#x4F20;&#x53C2;" class="anchor-navigation-ex-anchor" href="#3-native&#x5411;rn&#x81EA;&#x5B9A;&#x4E49;&#x4F20;&#x53C2;"><i class="fa fa-link" aria-hidden="true"></i></a>3 Native&#x5411;RN&#x81EA;&#x5B9A;&#x4E49;&#x4F20;&#x53C2;</h4>
+<ul>
+<li>&#x5728;&#x7EE7;&#x627F;<code>ReactActivity</code>&#x7684;RN&#x5165;&#x53E3;Activity&#x4E2D;&#xFF0C;&#x81EA;&#x5B9A;&#x4E49;<code>CustomDelegate</code>&#xFF08;&#x7EE7;&#x627F;ReactActivityDelegate&#xFF09;&#xFF1B;</li>
+<li>&#x7136;&#x540E;&#x91CD;&#x5199;<code>CustomDelegate</code>&#x7684;<code>getLaunchOptions()</code>&#x65B9;&#x6CD5;&#xFF0C;&#x6B64;&#x5904;&#x7684;Bundle&#x5373;&#x4E3A;&#x8981;&#x4F20;&#x9012;&#x7684;&#x53C2;&#x6570;Bundle&#xFF1B;</li>
+<li>&#x518D;&#x91CD;&#x5199;RN&#x5165;&#x53E3;Activity&#x7684;<code>createReactActivityDelegate()</code>&#x65B9;&#x6CD5;&#xFF0C;&#x8FD4;&#x56DE;<code>CustomDelegate</code>&#x5B9E;&#x4F8B;&#xFF1B;</li>
+<li>RN&#x7AEF;&#x53C2;&#x6570;&#x63A5;&#x6536;&#x901A;&#x8FC7;&#x5165;&#x53E3;&#x9875;&#x9762;&#x7684;<code>this.props</code>&#x83B7;&#x53D6;&#xFF0C;&#x5177;&#x4F53;&#x53EF;&#x53C2;&#x8003;demo</li>
+</ul>
+<p>&#x793A;&#x4F8B;&#xFF1A;</p>
+<pre><code class="lang-java"><span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">ReactNativeActivity</span> <span class="hljs-keyword">extends</span> <span class="hljs-title">ReactActivity</span> </span>{
+
+    <span class="hljs-keyword">private</span> String strData;
+
+    <span class="hljs-meta">@Override</span>
+    <span class="hljs-function"><span class="hljs-keyword">protected</span> <span class="hljs-keyword">void</span> <span class="hljs-title">onCreate</span><span class="hljs-params">(Bundle savedInstanceState)</span> </span>{
+        Intent intent = getIntent();
+        <span class="hljs-keyword">if</span> (intent != <span class="hljs-keyword">null</span>){
+            strData = intent.getStringExtra(<span class="hljs-string">&quot;msgKey&quot;</span>);
+        }
+        <span class="hljs-keyword">super</span>.onCreate(savedInstanceState);
+    }
+
+    <span class="hljs-meta">@Nullable</span>
+    <span class="hljs-meta">@Override</span>
+    <span class="hljs-function"><span class="hljs-keyword">protected</span> String <span class="hljs-title">getMainComponentName</span><span class="hljs-params">()</span> </span>{
+        <span class="hljs-keyword">return</span> <span class="hljs-string">&quot;RNTest&quot;</span>;
+    }
+
+    <span class="hljs-meta">@Override</span>
+    <span class="hljs-function"><span class="hljs-keyword">protected</span> ReactActivityDelegate <span class="hljs-title">createReactActivityDelegate</span><span class="hljs-params">()</span> </span>{
+        <span class="hljs-keyword">return</span> <span class="hljs-keyword">new</span> CustomDelegate(<span class="hljs-keyword">this</span>,getMainComponentName());
+    }
+
+    <span class="hljs-comment">//&#x81EA;&#x5B9A;&#x4E49;ReactDelegate</span>
+    <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">CustomDelegate</span> <span class="hljs-keyword">extends</span> <span class="hljs-title">ReactActivityDelegate</span> </span>{
+
+        <span class="hljs-function"><span class="hljs-keyword">private</span> <span class="hljs-title">CustomDelegate</span><span class="hljs-params">(Activity activity, @Nullable String mainComponentName)</span> </span>{
+            <span class="hljs-keyword">super</span>(activity, mainComponentName);
+        }
+
+        <span class="hljs-meta">@Nullable</span>
+        <span class="hljs-meta">@Override</span>
+        <span class="hljs-function"><span class="hljs-keyword">protected</span> Bundle <span class="hljs-title">getLaunchOptions</span><span class="hljs-params">()</span> </span>{
+            Bundle bundle = <span class="hljs-keyword">new</span> Bundle();
+            bundle.putString(<span class="hljs-string">&quot;msg&quot;</span>,strData);
+            <span class="hljs-keyword">return</span> bundle;
+        }
+    }
+}
+</code></pre>
+<h3 id="4-&#x5B8C;&#x6574;demo&#xFF08;&#x5305;&#x542B;ios--android"><a name="4-&#x5B8C;&#x6574;demo&#xFF08;&#x5305;&#x542B;ios--android" class="anchor-navigation-ex-anchor" href="#4-&#x5B8C;&#x6574;demo&#xFF08;&#x5305;&#x542B;ios--android"><i class="fa fa-link" aria-hidden="true"></i></a>4 &#x5B8C;&#x6574;Demo&#xFF08;&#x5305;&#x542B;iOS &amp; Android)</h3>
+<p><a href="https://github.com/BulldogX/RN-NativeTest.git" target="_blank">RN-NativeTest</a> </p>
+<footer class="page-footer"><span class="copyright">Copyright &#xA9; Kede 2019 all right reserved&#xFF0C;powered by Gitbook</span><span class="footer-modification">&#x4FEE;&#x8BA2;&#x65F6;&#x95F4;&#xFF1A;
+2019-10-16 13:04:39
+</span></footer>
+                                
+                                </section>
+                            
+    </div>
+    <div class="search-results">
+        <div class="has-results">
+            
+            <h1 class="search-results-title"><span class='search-results-count'></span> results matching "<span class='search-query'></span>"</h1>
+            <ul class="search-results-list"></ul>
+            
+        </div>
+        <div class="no-results">
+            
+            <h1 class="search-results-title">No results matching "<span class='search-query'></span>"</h1>
+            
+        </div>
+    </div>
+</div>
+
+                        </div>
+                    </div>
+                
+            </div>
+
+            
+                
+                <a href="ReactNative与iOS的交互.html" class="navigation navigation-prev " aria-label="Previous page: ReactNative与iOS的交互">
+                    <i class="fa fa-angle-left"></i>
+                </a>
+                
+                
+                <a href="ReactNative踩坑记录.html" class="navigation navigation-next " aria-label="Next page: ReactNative踩坑记录">
+                    <i class="fa fa-angle-right"></i>
+                </a>
+                
+            
+        
+    </div>
+
+    <script>
+        var gitbook = gitbook || [];
+        gitbook.push(function() {
+            gitbook.page.hasChanged({"page":{"title":"ReactNative与Android的交互","level":"3.1.4","depth":2,"next":{"title":"ReactNative踩坑记录","level":"3.1.5","depth":2,"path":"content/ReactNative/ReactNative踩坑记录.md","ref":"./content/ReactNative/ReactNative踩坑记录.md","articles":[]},"previous":{"title":"ReactNative与iOS的交互","level":"3.1.3","depth":2,"path":"content/ReactNative/ReactNative与iOS的交互.md","ref":"./content/ReactNative/ReactNative与iOS的交互.md","articles":[]},"dir":"ltr"},"config":{"plugins":["theme-code@0.0.20","-lunr","-search","search-pro","splitter","tbfed-pagefooter","chapter-fold","code","-copy-code-button","anchor-navigation-ex","expandable-chapters","livereload"],"root":"./","styles":{"website":"styles/website.css"},"pluginsConfig":{"tbfed-pagefooter":{"copyright":"Copyright &copy Kede 2019","modify_label":"修订时间：","modify_format":"YYYY-MM-DD HH:mm:ss"},"chapter-fold":{},"livereload":{},"splitter":{},"search-pro":{},"code":{"copyButtons":true},"theme-code":{"showLevel":false,"styles":{"ebook":"styles/ebook.css","epub":"styles/epub.css","mobi":"styles/mobi.css","pdf":"styles/pdf.css","print":"styles/print.css","website":"styles/website.css"}},"fontsettings":{"theme":"white","family":"sans","size":2},"highlight":{},"anchor-navigation-ex":{"associatedWithSummary":true,"float":{"floatIcon":"fa fa-navicon","level1Icon":"","level2Icon":"","level3Icon":"","showLevelIcon":false},"mode":"float","multipleH1":true,"pageTop":{"level1Icon":"","level2Icon":"","level3Icon":"","showLevelIcon":false},"printLog":false,"showGoTop":true,"showLevel":false},"sharing":{"facebook":true,"twitter":true,"google":false,"weibo":false,"instapaper":false,"vk":false,"all":["facebook","google","twitter","weibo","instapaper"]},"theme-default":{"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"},"showLevel":true},"expandable-chapters":{}},"copyright":"All Rights Reserved","theme":"default","pdf":{"pageNumbers":true,"fontSize":12,"fontFamily":"Arial","paperSize":"a4","chapterMark":"pagebreak","pageBreaksBefore":"/","margin":{"right":62,"left":62,"top":56,"bottom":56}},"structure":{"langs":"LANGS.md","readme":"README.md","glossary":"GLOSSARY.md","summary":"SUMMARY.md"},"variables":{},"title":"BulldogX's Note","language":"zh-hans","gitbook":"*"},"file":{"path":"content/ReactNative/ReactNative与Android的交互.md","mtime":"2019-10-16T05:04:39.264Z","type":"markdown"},"gitbook":{"version":"3.2.3","time":"2019-12-13T07:32:48.746Z"},"basePath":"../..","book":{"language":""}});
+        });
+    </script>
+</div>
+
+
+        
+    <script src="../../gitbook/gitbook.js"></script>
+    <script src="../../gitbook/theme.js"></script>
+    
+        
+        <script src="../../gitbook/gitbook-plugin-search-pro/jquery.mark.min.js"></script>
+        
+    
+        
+        <script src="../../gitbook/gitbook-plugin-search-pro/search.js"></script>
+        
+    
+        
+        <script src="../../gitbook/gitbook-plugin-splitter/splitter.js"></script>
+        
+    
+        
+        <script src="../../gitbook/gitbook-plugin-chapter-fold/chapter-fold.js"></script>
+        
+    
+        
+        <script src="../../gitbook/gitbook-plugin-code/plugin.js"></script>
+        
+    
+        
+        <script src="../../gitbook/gitbook-plugin-expandable-chapters/expandable-chapters.js"></script>
+        
+    
+        
+        <script src="../../gitbook/gitbook-plugin-livereload/plugin.js"></script>
+        
+    
+        
+        <script src="../../gitbook/gitbook-plugin-sharing/buttons.js"></script>
+        
+    
+        
+        <script src="../../gitbook/gitbook-plugin-fontsettings/fontsettings.js"></script>
+        
+    
+
+    </body>
+</html>
+

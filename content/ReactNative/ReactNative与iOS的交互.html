@@ -1,0 +1,861 @@
+
+<!DOCTYPE HTML>
+<html lang="zh-hans" >
+    <head>
+        <meta charset="UTF-8">
+        <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
+        <title>ReactNative与iOS的交互 · BulldogX's Note</title>
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta name="description" content="">
+        <meta name="generator" content="GitBook 3.2.3">
+        
+        
+        
+    
+    <link rel="stylesheet" href="../../gitbook/style.css">
+
+    
+            
+                
+                <link rel="stylesheet" href="../../gitbook/gitbook-plugin-search-pro/search.css">
+                
+            
+                
+                <link rel="stylesheet" href="../../gitbook/gitbook-plugin-splitter/splitter.css">
+                
+            
+                
+                <link rel="stylesheet" href="../../gitbook/gitbook-plugin-tbfed-pagefooter/footer.css">
+                
+            
+                
+                <link rel="stylesheet" href="../../gitbook/gitbook-plugin-chapter-fold/chapter-fold.css">
+                
+            
+                
+                <link rel="stylesheet" href="../../gitbook/gitbook-plugin-code/plugin.css">
+                
+            
+                
+                <link rel="stylesheet" href="../../gitbook/gitbook-plugin-anchor-navigation-ex/style/plugin.css">
+                
+            
+                
+                <link rel="stylesheet" href="../../gitbook/gitbook-plugin-expandable-chapters/expandable-chapters.css">
+                
+            
+                
+                <link rel="stylesheet" href="../../gitbook/gitbook-plugin-highlight/website.css">
+                
+            
+                
+                <link rel="stylesheet" href="../../gitbook/gitbook-plugin-fontsettings/website.css">
+                
+            
+        
+
+    
+
+    
+        
+        <link rel="stylesheet" href="../../styles/website.css">
+        
+    
+
+        
+    
+    
+    <meta name="HandheldFriendly" content="true"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <link rel="apple-touch-icon-precomposed" sizes="152x152" href="../../gitbook/images/apple-touch-icon-precomposed-152.png">
+    <link rel="shortcut icon" href="../../gitbook/images/favicon.ico" type="image/x-icon">
+
+    
+    <link rel="next" href="ReactNative与Android的交互.html" />
+    
+    
+    <link rel="prev" href="ReactNative集成到原生项目.html" />
+    
+
+    </head>
+    <body>
+        
+
+
+<div class="book">
+    <div class="book-summary">
+        
+            <div class="theme-code-header">
+                <a href="./" class="link">
+                    <h1 class="title">BulldogX's Note</h1>
+                </a>
+            </div>
+            
+<div id="book-search-input" role="search">
+    <input type="text" placeholder="输入并搜索" />
+</div>
+
+            
+                <nav role="navigation">
+                
+
+
+<ul class="summary">
+    
+    
+
+    
+
+    
+        
+        
+    
+        <li class="chapter " data-level="1.1" >
+            
+                <span>
+            
+                    
+                        <b>1.1.</b>
+                    
+                    iOS
+            
+                </span>
+            
+
+            
+            <ul class="articles">
+                
+    
+        <li class="chapter " data-level="1.1.1" data-path="../../">
+            
+                <a href="../../">
+            
+                    
+                        <b>1.1.1.</b>
+                    
+                    Swift中的可选类型?和隐式解析可选类型!
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.1.2" data-path="../iOS/Swiftif-let&guard-let.html">
+            
+                <a href="../iOS/Swiftif-let&guard-let.html">
+            
+                    
+                        <b>1.1.2.</b>
+                    
+                    Swift if-let & guard-let
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.1.3" data-path="../iOS/SwiftTips.html">
+            
+                <a href="../iOS/SwiftTips.html">
+            
+                    
+                        <b>1.1.3.</b>
+                    
+                    SwiftTips
+            
+                </a>
+            
+
+            
+        </li>
+    
+
+            </ul>
+            
+        </li>
+    
+
+    
+        
+        <li class="divider"></li>
+        
+        
+    
+        <li class="chapter " data-level="2.1" >
+            
+                <span>
+            
+                    
+                        <b>2.1.</b>
+                    
+                    Mac
+            
+                </span>
+            
+
+            
+            <ul class="articles">
+                
+    
+        <li class="chapter " data-level="2.1.1" data-path="../Mac/Homebrew.html">
+            
+                <a href="../Mac/Homebrew.html">
+            
+                    
+                        <b>2.1.1.</b>
+                    
+                    Homebrew
+            
+                </a>
+            
+
+            
+        </li>
+    
+
+            </ul>
+            
+        </li>
+    
+
+    
+        
+        <li class="divider"></li>
+        
+        
+    
+        <li class="chapter " data-level="3.1" >
+            
+                <span>
+            
+                    
+                        <b>3.1.</b>
+                    
+                    ReactNative
+            
+                </span>
+            
+
+            
+            <ul class="articles">
+                
+    
+        <li class="chapter " data-level="3.1.1" data-path="ReactNative常用命令.html">
+            
+                <a href="ReactNative常用命令.html">
+            
+                    
+                        <b>3.1.1.</b>
+                    
+                    ReactNative常用命令
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="3.1.2" data-path="ReactNative集成到原生项目.html">
+            
+                <a href="ReactNative集成到原生项目.html">
+            
+                    
+                        <b>3.1.2.</b>
+                    
+                    ReactNative集成到原生项目
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter active" data-level="3.1.3" data-path="ReactNative与iOS的交互.html">
+            
+                <a href="ReactNative与iOS的交互.html">
+            
+                    
+                        <b>3.1.3.</b>
+                    
+                    ReactNative与iOS的交互
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="3.1.4" data-path="ReactNative与Android的交互.html">
+            
+                <a href="ReactNative与Android的交互.html">
+            
+                    
+                        <b>3.1.4.</b>
+                    
+                    ReactNative与Android的交互
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="3.1.5" data-path="ReactNative踩坑记录.html">
+            
+                <a href="ReactNative踩坑记录.html">
+            
+                    
+                        <b>3.1.5.</b>
+                    
+                    ReactNative踩坑记录
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="3.1.6" data-path="ReactNative触摸事件.html">
+            
+                <a href="ReactNative触摸事件.html">
+            
+                    
+                        <b>3.1.6.</b>
+                    
+                    ReactNative触摸事件
+            
+                </a>
+            
+
+            
+        </li>
+    
+
+            </ul>
+            
+        </li>
+    
+
+    
+
+    <li class="divider"></li>
+
+    <li>
+        <a href="" target="_blank" class="gitbook-link">
+            作者：
+        </a>
+    </li>
+</ul>
+
+
+                </nav>
+            
+        
+    </div>
+
+    <div class="book-body">
+        
+            <div class="body-inner">
+                
+                    
+
+<div class="book-header" role="navigation">
+    
+
+    <!-- Title -->
+    <h1>
+        <i class="fa fa-circle-o-notch fa-spin"></i>
+        <a href="../.." >ReactNative与iOS的交互</a>
+    </h1>
+</div>
+
+
+
+
+                    <div class="page-wrapper" tabindex="-1" role="main">
+                        <div class="page-inner">
+                            
+<div id="book-search-results">
+    <div class="search-noresults">
+    
+                                <section class="normal markdown-section">
+                                
+                                <div id="anchor-navigation-ex-navbar"><i class="fa fa-navicon"></i><ul><ul><ul><li><span class="title-icon "></span><a href="#11-rctrootview&#x521D;&#x59CB;&#x5316;&#x95EE;&#x9898;"><b></b>1.1 RCTRootView&#x521D;&#x59CB;&#x5316;&#x95EE;&#x9898;</a></li><li><span class="title-icon "></span><a href="#12-&#x521B;&#x5EFA;&#x81EA;&#x5B9A;&#x4E49;&#x7684;rnbridgemanager"><b></b>1.2 &#x521B;&#x5EFA;&#x81EA;&#x5B9A;&#x4E49;&#x7684;RNBridgeManager</a></li><li><span class="title-icon "></span><a href="#13-native&#x8FDB;&#x5165;rn&#x9875;&#x9762;"><b></b>1.3 Native&#x8FDB;&#x5165;RN&#x9875;&#x9762;</a></li><li><span class="title-icon "></span><a href="#14-rn&#x8C03;&#x7528;native&#x65B9;&#x6CD5;"><b></b>1.4 RN&#x8C03;&#x7528;Native&#x65B9;&#x6CD5;</a></li><li><span class="title-icon "></span><a href="#15-native&#x7AEF;&#x53D1;&#x9001;&#x901A;&#x77E5;&#x5230;rn"><b></b>1.5 Native&#x7AEF;&#x53D1;&#x9001;&#x901A;&#x77E5;&#x5230;RN</a></li><li><span class="title-icon "></span><a href="#16-&#x5B8C;&#x6574;demo&#xFF08;&#x5305;&#x542B;ios--android"><b></b>1.6 &#x5B8C;&#x6574;Demo&#xFF08;&#x5305;&#x542B;iOS &amp; Android)</a></li></ul></ul></ul></div><a href="#" id="anchorNavigationExGoTop"><i class="fa fa-arrow-up"></i></a><hr>
+<p>title: ReactNative&#x4E0E;iOS&#x7684;&#x4EA4;&#x4E92;
+date: 2018-12-20 15:32:06
+categories:</p>
+<ul>
+<li>ReactNative
+tags:</li>
+<li>ReactNative</li>
+</ul>
+<hr>
+<h3 id="11-rctrootview&#x521D;&#x59CB;&#x5316;&#x95EE;&#x9898;"><a name="11-rctrootview&#x521D;&#x59CB;&#x5316;&#x95EE;&#x9898;" class="anchor-navigation-ex-anchor" href="#11-rctrootview&#x521D;&#x59CB;&#x5316;&#x95EE;&#x9898;"><i class="fa fa-link" aria-hidden="true"></i></a>1.1 RCTRootView&#x521D;&#x59CB;&#x5316;&#x95EE;&#x9898;</h3>
+<pre><code class="lang-objective-c">/**
+ * - Designated initializer -
+ */
+- (instancetype)initWithBridge:(RCTBridge *)bridge
+                    moduleName:(NSString *)moduleName
+             initialProperties:(NSDictionary *)initialProperties NS_DESIGNATED_INITIALIZER;
+
+/**
+ * - Convenience initializer -
+ * A bridge will be created internally.
+ * This initializer is intended to be used when the app has a single RCTRootView,
+ * otherwise create an `RCTBridge` and pass it in via `initWithBridge:moduleName:`
+ * to all the instances.
+ */
+- (instancetype)initWithBundleURL:(NSURL *)bundleURL
+                       moduleName:(NSString *)moduleName
+                initialProperties:(NSDictionary *)initialProperties
+                    launchOptions:(NSDictionary *)launchOptions;
+</code></pre>
+<!--more-->
+<blockquote>
+<p>1&#x3001;&#x5F53;Native APP&#x5185;&#x53EA;&#x6709;&#x4E00;&#x5904;RN&#x7684;&#x5165;&#x53E3;&#x65F6;&#xFF0C;&#x53EF;&#x4EE5;&#x4F7F;&#x7528;<code>initWithBundleURL</code>&#xFF0C;&#x5426;&#x5219;&#x7684;&#x8BDD;&#x5C31;&#x8981;&#x4F7F;&#x7528;<code>initWithBridge</code>&#x65B9;&#x6CD5;&#x3002;
+2&#x3001;&#x56E0;&#x4E3A;<code>initWithBundleURL</code>&#x4F1A;&#x5728;&#x5185;&#x90E8;&#x521B;&#x5EFA;&#x4E00;&#x4E2A;<code>RCTBridge</code>&#xFF0C;&#x5F53;&#x6709;&#x591A;&#x4E2A;<code>RCTRootView</code>&#x5165;&#x53E3;&#x65F6;&#xFF0C;&#x5C31;&#x4F1A;&#x5B58;&#x5728;&#x591A;&#x4E2A;<code>RCTBridge</code>&#xFF0C;&#x5BB9;&#x6613;&#x5BFC;&#x81F4;Native&#x7AEF;&#x4E0E;RN&#x4EA4;&#x4E92;&#x65F6;&#x591A;&#x6B21;&#x54CD;&#x5E94;&#xFF0C;&#x51FA;&#x73B0;BUG&#x3002;</p>
+</blockquote>
+<h3 id="12-&#x521B;&#x5EFA;&#x81EA;&#x5B9A;&#x4E49;&#x7684;rnbridgemanager"><a name="12-&#x521B;&#x5EFA;&#x81EA;&#x5B9A;&#x4E49;&#x7684;rnbridgemanager" class="anchor-navigation-ex-anchor" href="#12-&#x521B;&#x5EFA;&#x81EA;&#x5B9A;&#x4E49;&#x7684;rnbridgemanager"><i class="fa fa-link" aria-hidden="true"></i></a>1.2 &#x521B;&#x5EFA;&#x81EA;&#x5B9A;&#x4E49;&#x7684;<code>RNBridgeManager</code></h3>
+<blockquote>
+<p>&#x7531;&#x4E8E;APP&#x5185;&#x6709;RN&#x591A;&#x5165;&#x53E3;&#x7684;&#x9700;&#x6C42;&#xFF0C;&#x6240;&#x4EE5;&#x5171;&#x7528;&#x4E00;&#x4E2A;<code>RCTBridge</code></p>
+</blockquote>
+<p><strong>RNBridgeManager.h</strong></p>
+<pre><code class="lang-objective-c">
+#import &lt;Foundation/Foundation.h&gt;
+#import &lt;React/RCTBridge.h&gt;
+
+NS_ASSUME_NONNULL_BEGIN
+
+@interface RNBridgeManager : RCTBridge
+/**
+ RNBridgeManager&#x5355;&#x4F8B;
+ */
++ (instancetype)sharedManager;
+
+@end
+
+NS_ASSUME_NONNULL_END
+</code></pre>
+<p><strong>RNBridgeManager.m</strong></p>
+<pre><code class="lang-objective-c">#import &quot;RNBridgeManager.h&quot;
+
+#import &lt;React/RCTBundleURLProvider.h&gt;
+
+//dev&#x6A21;&#x5F0F;&#x4E0B;:RCTBridge required dispatch_sync to load RCTDevLoadingView Error Fix
+#if RCT_DEV
+#import &lt;React/RCTDevLoadingView.h&gt;
+#endif
+/**
+ &#x81EA;&#x5B9A;&#x4E49;&#x7C7B;&#xFF0C;&#x5B9E;&#x73B0;RCTBridgeDelegate
+ */
+@interface BridgeHandle : NSObject&lt;RCTBridgeDelegate&gt;
+
+@end
+
+@implementation BridgeHandle
+
+- (NSURL *)sourceURLForBridge:(RCTBridge *)bridge{
+    return [[RCTBundleURLProvider sharedSettings] jsBundleURLForBundleRoot:@&quot;index&quot; fallbackResource:nil];
+}
+@end
+
+
+@implementation RNBridgeManager
+
++ (instancetype)sharedManager{
+    static RNBridgeManager *manager;
+    static dispatch_once_t onceToken;
+    dispatch_once(&amp;onceToken, ^{
+        manager = [[RNBridgeManager alloc] initWithDelegate:[[BridgeHandle alloc] init] launchOptions:nil];
+#if RCT_DEV
+        [manager moduleForClass:[RCTDevLoadingView class]];
+#endif
+    });
+     return manager;
+}
+
+
+@end
+</code></pre>
+<h3 id="13-native&#x8FDB;&#x5165;rn&#x9875;&#x9762;"><a name="13-native&#x8FDB;&#x5165;rn&#x9875;&#x9762;" class="anchor-navigation-ex-anchor" href="#13-native&#x8FDB;&#x5165;rn&#x9875;&#x9762;"><i class="fa fa-link" aria-hidden="true"></i></a>1.3 Native&#x8FDB;&#x5165;RN&#x9875;&#x9762;</h3>
+<pre><code class="lang-objective-c"> RCTRootView *rootView = [[RCTRootView alloc] initWithBridge:[RNBridgeManager sharedManager] moduleName:@&quot;RNTest&quot; initialProperties:nil];
+ UIViewController *vc = [[UIViewController alloc] init];
+ vc.view = rootView;
+ [self.navigationController pushViewController:vc animated:YES];
+</code></pre>
+<h3 id="14-rn&#x8C03;&#x7528;native&#x65B9;&#x6CD5;"><a name="14-rn&#x8C03;&#x7528;native&#x65B9;&#x6CD5;" class="anchor-navigation-ex-anchor" href="#14-rn&#x8C03;&#x7528;native&#x65B9;&#x6CD5;"><i class="fa fa-link" aria-hidden="true"></i></a>1.4 RN&#x8C03;&#x7528;Native&#x65B9;&#x6CD5;</h3>
+<ul>
+<li>&#x521B;&#x5EFA;&#x4E00;&#x4E2A;&#x4EA4;&#x4E92;&#x7684;&#x7C7B;&#xFF0C;&#x5B9E;&#x73B0;<code>&lt;RCTBridgeModule&gt;</code>&#x534F;&#x8BAE;&#xFF1B;</li>
+<li>&#x56FA;&#x5B9A;&#x683C;&#x5F0F;&#xFF1A;&#x5728;.m&#x7684;&#x5B9E;&#x73B0;&#x4E2D;&#xFF0C;&#x9996;&#x5148;&#x5BFC;&#x51FA;&#x6A21;&#x5757;&#x540D;&#x5B57;<code>RCT_EXPORT_MODULE();</code>&#xFF0C;<code>RCT_EXPORT_MODULE</code>&#x63A5;&#x53D7;&#x5B57;&#x7B26;&#x4E32;&#x4F5C;&#x4E3A;&#x5176;Module&#x7684;&#x540D;&#x79F0;&#xFF0C;&#x5982;&#x679C;&#x4E0D;&#x8BBE;&#x7F6E;&#x540D;&#x79F0;&#x7684;&#x8BDD;&#x9ED8;&#x8BA4;&#x5C31;&#x4F7F;&#x7528;&#x7C7B;&#x540D;&#x4F5C;&#x4E3A;Modul&#x7684;&#x540D;&#x79F0;&#xFF1B;</li>
+<li>&#x4F7F;&#x7528;<code>RCT_EXPORT_METHOD</code>&#x5BFC;&#x51FA;Native&#x7684;&#x65B9;&#x6CD5;&#xFF1B;</li>
+</ul>
+<h4 id="141-&#x6BD4;&#x5982;&#x6211;&#x4EEC;&#x5BFC;&#x51FA;native&#x7AEF;&#x7684;svprogresshud&#x63D0;&#x793A;&#x65B9;&#x6CD5;&#xFF1A;"><a name="141-&#x6BD4;&#x5982;&#x6211;&#x4EEC;&#x5BFC;&#x51FA;native&#x7AEF;&#x7684;svprogresshud&#x63D0;&#x793A;&#x65B9;&#x6CD5;&#xFF1A;" class="anchor-navigation-ex-anchor" href="#141-&#x6BD4;&#x5982;&#x6211;&#x4EEC;&#x5BFC;&#x51FA;native&#x7AEF;&#x7684;svprogresshud&#x63D0;&#x793A;&#x65B9;&#x6CD5;&#xFF1A;"><i class="fa fa-link" aria-hidden="true"></i></a>1.4.1 &#x6BD4;&#x5982;&#x6211;&#x4EEC;&#x5BFC;&#x51FA;Native&#x7AEF;&#x7684;<code>SVProgressHUD</code>&#x63D0;&#x793A;&#x65B9;&#x6CD5;&#xFF1A;</h4>
+<p><strong>RNInterractModule.h</strong></p>
+<pre><code class="lang-objective-c">#import &lt;Foundation/Foundation.h&gt;
+#import &lt;React/RCTBridgeModule.h&gt;
+
+NS_ASSUME_NONNULL_BEGIN
+
+@interface RNInterractModule : NSObject&lt;RCTBridgeModule&gt;
+
+@end
+
+NS_ASSUME_NONNULL_END
+</code></pre>
+<p><strong>RNInterractModule.m</strong></p>
+<pre><code class="lang-objective-c">import &quot;RNInterractModule.h&quot;
+#import &quot;Util.h&quot;
+#import &lt;SVProgressHUD.h&gt;
+
+@implementation RNInterractModule
+////RCT_EXPORT_MODULE&#x63A5;&#x53D7;&#x5B57;&#x7B26;&#x4E32;&#x4F5C;&#x4E3A;&#x5176;Module&#x7684;&#x540D;&#x79F0;&#xFF0C;&#x5982;&#x679C;&#x4E0D;&#x8BBE;&#x7F6E;&#x540D;&#x79F0;&#x7684;&#x8BDD;&#x9ED8;&#x8BA4;&#x5C31;&#x4F7F;&#x7528;&#x7C7B;&#x540D;&#x4F5C;&#x4E3A;Modul&#x7684;&#x540D;&#x79F0;
+RCT_EXPORT_MODULE();
+
+//==============1&#x3001;&#x63D0;&#x793A;==============
+RCT_EXPORT_METHOD(showInfo:(NSString *) info){
+    dispatch_sync(dispatch_get_main_queue(), ^{
+        [SVProgressHUD showInfoWithStatus:info];
+    });
+}
+@end
+</code></pre>
+<h4 id="142-rn&#x7AEF;&#x8C03;&#x7528;&#x5BFC;&#x51FA;&#x7684;showinfo&#x65B9;&#x6CD5;&#xFF1A;"><a name="142-rn&#x7AEF;&#x8C03;&#x7528;&#x5BFC;&#x51FA;&#x7684;showinfo&#x65B9;&#x6CD5;&#xFF1A;" class="anchor-navigation-ex-anchor" href="#142-rn&#x7AEF;&#x8C03;&#x7528;&#x5BFC;&#x51FA;&#x7684;showinfo&#x65B9;&#x6CD5;&#xFF1A;"><i class="fa fa-link" aria-hidden="true"></i></a>1.4.2 RN&#x7AEF;&#x8C03;&#x7528;&#x5BFC;&#x51FA;&#x7684;showInfo&#x65B9;&#x6CD5;&#xFF1A;</h4>
+<p>&#x6211;&#x4EEC;&#x5728;RN&#x7AEF;&#x628A;Native&#x7684;&#x65B9;&#x6CD5;&#x901A;&#x8FC7;&#x4E00;&#x4E2A;&#x5171;&#x540C;&#x7684;utils&#x5DE5;&#x5177;&#x7C7B;&#x5F15;&#x5165;&#xFF0C;&#x5982;&#x4E0B;</p>
+<pre><code class="lang-js">
+<span class="hljs-keyword">import</span> { NativeModules } <span class="hljs-keyword">from</span> <span class="hljs-string">&apos;react-native&apos;</span>;
+
+<span class="hljs-comment">//&#x5BFC;&#x51FA;Native&#x7AEF;&#x7684;&#x65B9;&#x6CD5;</span>
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">const</span> { showInfo} = NativeModules.RNInterractModule;
+</code></pre>
+<p>&#x5177;&#x4F53;&#x7684;RN&#x9875;&#x9762;&#x4F7F;&#x7528;&#x65F6;&#xFF1A;</p>
+<pre><code class="lang-js"><span class="hljs-keyword">import</span> { showInfo } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;../utils&quot;</span>;
+
+<span class="hljs-comment">//&#x901A;&#x8FC7;Button&#x70B9;&#x51FB;&#x4E8B;&#x4EF6;&#x89E6;&#x53D1;</span>
+&lt;Button
+    title=<span class="hljs-string">&apos;1&#x3001;&#x8C03;&#x7528;Native&#x63D0;&#x793A;&apos;</span>
+    onPress={() =&gt; showInfo(<span class="hljs-string">&apos;&#x6211;&#x662F;&#x539F;&#x751F;&#x7AEF;&#x7684;&#x63D0;&#x793A;&#xFF01;&apos;</span>)}
+/&gt;
+</code></pre>
+<p>&#x8C03;&#x7528;&#x6548;&#x679C;&#xFF1A;
+<img src="https://ws1.sinaimg.cn/large/72ebc0edgy1fybv53uebvg208z0idaac.gif" alt="image"></p>
+<h4 id="143-rn&#x56DE;&#x8C03;native"><a name="143-rn&#x56DE;&#x8C03;native" class="anchor-navigation-ex-anchor" href="#143-rn&#x56DE;&#x8C03;native"><i class="fa fa-link" aria-hidden="true"></i></a>1.4.3 RN&#x56DE;&#x8C03;Native</h4>
+<blockquote>
+<p>RN&#x6587;&#x6863;&#x663E;&#x793A;&#xFF0C;&#x76EE;&#x524D;iOS&#x7AEF;&#x7684;&#x56DE;&#x8C03;&#x8FD8;&#x5904;&#x4E8E;&#x5B9E;&#x9A8C;&#x9636;&#x6BB5;</p>
+</blockquote>
+<p>&#x6211;&#x4EEC;&#x63D0;&#x4F9B;&#x4E00;&#x4E2A;&#x4F8B;&#x5B50;&#x6765;&#x6A21;&#x62DF;&#xFF1A;&#x76EE;&#x524D;&#x7684;&#x9700;&#x6C42;&#x662F;&#x505A;&#x9762;&#x5305;&#xFF0C;RN&#x7AEF;&#x80FD;&#x63D0;&#x4F9B;&#x9762;&#x7C89;&#xFF0C;&#x4F46;&#x662F;&#x4E0D;&#x4F1A;&#x505A;&#xFF0C;Native&#x7AEF;&#x662F;&#x6709;&#x505A;&#x9762;&#x5305;&#x7684;&#x529F;&#x80FD;&#xFF1B;&#x6240;&#x4EE5;&#x6211;&#x4EEC;&#x9700;&#x8981;&#x5148;&#x628A;&#x9762;&#x7C89;&#xFF0C;&#x4F20;&#x7ED9;Native&#x7AEF;&#xFF0C;Native&#x52A0;&#x5DE5;&#x597D;&#x9762;&#x5305;&#x4E4B;&#x540E;&#xFF0C;&#x518D;&#x901A;&#x8FC7;&#x56DE;&#x8C03;&#x56DE;&#x4F20;&#x7ED9;RN&#x7AEF;&#x3002;</p>
+<p>Native&#x7AEF;&#x63D0;&#x4F9B;&#x65B9;&#x6CD5;</p>
+<pre><code class="lang-objective-c">// &#x6BD4;&#x5982;&#x8C03;&#x7528;&#x539F;&#x751F;&#x7684;&#x65B9;&#x6CD5;&#x5904;&#x7406;&#x56FE;&#x7247;&#x3001;&#x89C6;&#x9891;&#x4E4B;&#x7C7B;&#x7684;&#xFF0C;&#x5904;&#x7406;&#x5B8C;&#x6210;&#x4E4B;&#x540E;&#x518D;&#x628A;&#x7ED3;&#x679C;&#x56DE;&#x4F20;&#x5230;RN&#x9875;&#x9762;&#x91CC;&#x53BB;
+//TODO&#xFF08;RN&#x6587;&#x6863;&#x663E;&#x793A;&#xFF0C;&#x76EE;&#x524D;iOS&#x7AEF;&#x7684;&#x56DE;&#x8C03;&#x8FD8;&#x5904;&#x4E8E;&#x5B9E;&#x9A8C;&#x9636;&#x6BB5;&#xFF09;
+RCT_EXPORT_METHOD(patCake:(NSString *)flour successBlock:(RCTResponseSenderBlock)successBlock errorBlock:(RCTResponseErrorBlock)errorBlock){
+    __weak __typeof(self)weakSelf = self;
+    dispatch_sync(dispatch_get_main_queue(), ^{
+        NSString *cake = [weakSelf patCake:flour];
+        //&#x6A21;&#x62DF;&#x6210;&#x529F;&#x3001;&#x5931;&#x8D25;&#x7684;block&#x5224;&#x65AD;
+        if([flour isKindOfClass:[NSString class]]){
+            successBlock(@[@[cake]]);//&#x6B64;&#x5904;&#x53C2;&#x6570;&#x9700;&#x8981;&#x653E;&#x5728;&#x6570;&#x7EC4;&#x91CC;&#x9762;
+        }else{
+            NSError *error = [NSError errorWithDomain:@&quot;com.RNTest&quot; code:-1 userInfo:@{@&quot;message&quot;:@&quot;&#x7C7B;&#x578B;&#x4E0D;&#x5339;&#x914D;&quot;}];
+            errorBlock(error);
+        }
+    });
+}
+
+
+//&#x4F7F;&#x7528;RN&#x7AEF;&#x4F20;&#x9012;&#x7684;&#x53C2;&#x6570;&#x5B57;&#x7B26;&#x4E32;&#xFF1A;&quot;&quot;&#xFF0C;&#x8C03;&#x7528;Native&#x7AEF;&#x7684;&#x505A;&#x9762;&#x5305;&#x65B9;&#x6CD5;&#xFF0C;&#x52A0;&#x5DE5;&#x6210;&#x9762;&#x5305;&#xFF0C;&#x518D;&#x56DE;&#x4F20;&#x7ED9;RN
+- (NSString *)patCake:(NSString *)flour{
+    NSString * cake = [NSString stringWithFormat:@&quot;&#x4F7F;&#x7528;%@&#xFF0C;&#x505A;&#x597D;&#x4E86;&#xFF1A;&#x1F382;&#x1F35E;&#x1F35E;&#x1F370;&#x1F370;&#x1F370;&quot;,flour];
+    return cake;
+}
+</code></pre>
+<p>RN&#x7AEF;&#x8C03;&#x7528;&#xFF1A;</p>
+<pre><code class="lang-js"><span class="hljs-comment">//&#x9996;&#x5148;&#x5DE5;&#x5177;&#x7C7B;&#x91CC;&#x5148;&#x5F15;&#x5165;</span>
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">const</span> { showInfo,patCake } = NativeModules.RNInterractModule;
+
+
+<span class="hljs-comment">//&#x5177;&#x4F53;&#x9875;&#x9762;&#x4F7F;&#x7528;</span>
+&lt;Button
+    title=<span class="hljs-string">&apos;4&#x3001;&#x56DE;&#x8C03;&#xFF1A;&#x4F7F;&#x7528;&#x9762;&#x7C89;&#x505A;&#x86CB;&#x7CD5;&apos;</span>
+    onPress={() =&gt; patCake(<span class="hljs-string">&apos;1&#x65A4;&#x9762;&#x7C89;&apos;</span>,
+        (cake) =&gt; alert(cake),
+        (error) =&gt; alert(<span class="hljs-string">&apos;&#x51FA;&#x9519;&#x4E86;&apos;</span> + error.message))}
+    /&gt;
+</code></pre>
+<p>&#x8C03;&#x7528;&#x6548;&#x679C;&#xFF1A;</p>
+<p><img src="https://ws1.sinaimg.cn/large/72ebc0edgy1fybvin9v20g208z0idq4j.gif" alt="image"></p>
+<h4 id="144-&#x4F7F;&#x7528;promise&#x56DE;&#x8C03;"><a name="144-&#x4F7F;&#x7528;promise&#x56DE;&#x8C03;" class="anchor-navigation-ex-anchor" href="#144-&#x4F7F;&#x7528;promise&#x56DE;&#x8C03;"><i class="fa fa-link" aria-hidden="true"></i></a>1.4.4 &#x4F7F;&#x7528;Promise&#x56DE;&#x8C03;</h4>
+<p>Native&#x7AEF;&#x63D0;&#x4F9B;&#x65B9;&#x6CD5;</p>
+<pre><code class="lang-objective-c">
+RCT_EXPORT_METHOD(callNameTointroduction:(NSString *)name resolver:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock) reject){
+    __weak __typeof(self)weakSelf = self;
+    dispatch_sync(dispatch_get_main_queue(), ^{
+        if ([name isKindOfClass:NSString.class]) {
+            resolve([weakSelf introduction:name]);
+        }else{
+            NSError *error = [NSError errorWithDomain:@&quot;com.RNTest&quot; code:-1 userInfo:@{@&quot;message&quot;:@&quot;&#x7C7B;&#x578B;&#x4E0D;&#x5339;&#x914D;&quot;}];
+            reject(@&quot;class_error&quot;,@&quot;Needs NSString Class&quot;,error);
+        }
+    });
+}
+
+- (NSString *)introduction:(NSString *)name{
+    return [NSString stringWithFormat:@&quot;&#x6211;&#x7684;&#x540D;&#x5B57;&#x53EB;%@&#xFF0C;&#x4ECA;&#x5E74;18&#x5C81;&#xFF0C;&#x559C;&#x6B22;&#x8FD0;&#x52A8;&#x3001;&#x542C;&#x6B4C;...&quot;,name];
+}
+</code></pre>
+<p>RN&#x7AEF;&#x8C03;&#x7528;&#xFF1A;</p>
+<pre><code class="lang-js"><span class="hljs-comment">//&#x9996;&#x5148;&#x5DE5;&#x5177;&#x7C7B;&#x91CC;&#x5148;&#x5F15;&#x5165;</span>
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">const</span> { showInfo,patCake, callNameTointroduction} = NativeModules.RNInterractModule;
+
+<span class="hljs-comment">//&#x5177;&#x4F53;&#x9875;&#x9762;&#x4F7F;&#x7528;</span>
+&lt;Button
+    title=<span class="hljs-string">&apos;5&#x3001;Promise&#xFF1A;&#x70B9;&#x540D;&#x81EA;&#x6211;&#x4ECB;&#x7ECD;&apos;</span>
+    onPress={
+        <span class="hljs-keyword">async</span> () =&gt; {
+            <span class="hljs-keyword">try</span> {
+                <span class="hljs-keyword">let</span> introduction = <span class="hljs-keyword">await</span> callNameTointroduction(<span class="hljs-string">&apos;&#x5C0F;&#x660E;&apos;</span>);
+                showInfo(introduction);
+            } <span class="hljs-keyword">catch</span> (e) {
+                alert(e.message);
+            }
+        }
+    }
+/&gt;
+</code></pre>
+<p>&#x8C03;&#x7528;&#x6548;&#x679C;&#xFF1A;
+<img src="https://wx3.sinaimg.cn/large/72ebc0edgy1fybvoha3crg208z0id3z1.gif" alt="image"></p>
+<h3 id="15-native&#x7AEF;&#x53D1;&#x9001;&#x901A;&#x77E5;&#x5230;rn"><a name="15-native&#x7AEF;&#x53D1;&#x9001;&#x901A;&#x77E5;&#x5230;rn" class="anchor-navigation-ex-anchor" href="#15-native&#x7AEF;&#x53D1;&#x9001;&#x901A;&#x77E5;&#x5230;rn"><i class="fa fa-link" aria-hidden="true"></i></a>1.5 Native&#x7AEF;&#x53D1;&#x9001;&#x901A;&#x77E5;&#x5230;RN</h3>
+<p>Native&#x7AEF;&#x7EE7;&#x627F;<code>RCTEventEmitter</code>,&#x5B9E;&#x73B0;&#x53D1;&#x9001;RN&#x901A;&#x77E5;&#x7C7B;&#xFF1A;</p>
+<p><strong>RNNotificationManager.h</strong></p>
+<pre><code class="lang-objective-c">
+#import &lt;Foundation/Foundation.h&gt;
+#import &lt;React/RCTEventEmitter.h&gt;
+#import &lt;React/RCTBridgeModule.h&gt;
+
+NS_ASSUME_NONNULL_BEGIN
+
+@interface RNNotificationManager : RCTEventEmitter
+
++ (instancetype)sharedManager;
+
+@end
+
+NS_ASSUME_NONNULL_END
+</code></pre>
+<p><strong>RNNotificationManager.m</strong></p>
+<pre><code class="lang-objective-c">
+#import &quot;RNNotificationManager.h&quot;
+
+@implementation RNNotificationManager
+{
+    BOOL hasListeners;
+}
+
+
++ (instancetype)sharedManager{
+    static RNNotificationManager *manager;
+    static dispatch_once_t onceToken;
+    dispatch_once(&amp;onceToken,^{
+        manager = [[self alloc] init];
+    });
+    return manager;
+}
+
+- (instancetype)init{
+    self = [super init];
+    if (self) {
+        NSNotificationCenter *center = [NSNotificationCenter defaultCenter];
+        [center removeObserver:self];
+        [center addObserver:self selector:@selector(handleEventNotification:) name:@&quot;kRNNotification_Login&quot; object:nil];
+        [center addObserver:self selector:@selector(handleEventNotification:) name:@&quot;kRNNotification_Logout&quot; object:nil];
+    };
+    return self;
+}
+
+
+RCT_EXPORT_MODULE()
+
+- (NSArray&lt;NSString *&gt; *)supportedEvents{
+    return @[
+             @&quot;kRNNotification_Login&quot;,
+             @&quot;kRNNotification_Logout&quot;
+             ];
+}
+//&#x4F18;&#x5316;&#x65E0;&#x76D1;&#x542C;&#x5904;&#x7406;&#x7684;&#x4E8B;&#x4EF6;
+//&#x5728;&#x6DFB;&#x52A0;&#x7B2C;&#x4E00;&#x4E2A;&#x76D1;&#x542C;&#x51FD;&#x6570;&#x65F6;&#x89E6;&#x53D1;
+- (void)startObserving{
+    //setup any upstream listenerse or background tasks as necessary
+    hasListeners = YES;
+    NSLog(@&quot;-----------&gt;startObserving&quot;);
+}
+
+//will be called when this mdules&apos;s last listener is removed,or on dealloc.
+- (void)stopObserving{
+    //remove upstream listeners,stop unnecessary background tasks.
+    hasListeners = NO;
+    NSLog(@&quot;-----------&gt;stopObserving&quot;);
+}
+
++ (BOOL)requiresMainQueueSetup{
+    return YES;
+}
+
+- (void)handleEventNotification:(NSNotification *)notification{
+    if (!hasListeners) {
+        return;
+    }
+
+    NSString *name = notification.name;
+    NSLog(@&quot;&#x901A;&#x77E5;&#x540D;&#x5B57;--------&gt;%@&quot;,name);
+    [self sendEventWithName:name body:notification.userInfo];
+
+}
+
+@end
+</code></pre>
+<p>RN&#x7AEF;&#x6CE8;&#x518C;&#x76D1;&#x542C;&#xFF1A;</p>
+<pre><code class="lang-js"><span class="hljs-comment">//utils&#x5DE5;&#x5177;&#x7C7B;&#x4E2D;&#x5BFC;&#x51FA;</span>
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">const</span> NativeEmitterModuleIOS = <span class="hljs-keyword">new</span> NativeEventEmitter(NativeModules.RNNotificationManager);
+
+
+<span class="hljs-comment">//&#x5177;&#x4F53;&#x9875;&#x9762;&#x4F7F;&#x7528;</span>
+<span class="hljs-keyword">import</span> { NativeEmitterModuleIOS } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;../utils&quot;</span>;
+
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">default</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">ActivityScene</span> <span class="hljs-keyword">extends</span> <span class="hljs-title">Component</span> </span>{
+
+    <span class="hljs-keyword">constructor</span>(props) {
+        <span class="hljs-keyword">super</span>(props);
+        <span class="hljs-keyword">this</span>.subscription = <span class="hljs-literal">null</span>;
+        <span class="hljs-keyword">this</span>.state = {
+            loginInfo: <span class="hljs-string">&apos;&#x5F53;&#x524D;&#x672A;&#x767B;&#x5F55;&apos;</span>,
+        };
+    }
+
+    updateLoginInfoText = (reminder) =&gt; {
+        <span class="hljs-keyword">this</span>.setState({loginInfo: reminder.message})
+    };
+
+    <span class="hljs-comment">//&#x6DFB;&#x52A0;&#x76D1;&#x542C;</span>
+    componentWillMount() {
+        <span class="hljs-keyword">this</span>.subscription = NativeEmitterModuleIOS.addListener(<span class="hljs-string">&apos;kRNNotification_Login&apos;</span>, <span class="hljs-keyword">this</span>.updateLoginInfoText);
+
+    }
+    <span class="hljs-comment">//&#x79FB;&#x9664;&#x76D1;&#x542C;</span>
+    componentWillUnmount() {
+            <span class="hljs-built_in">console</span>.log(<span class="hljs-string">&apos;ActivityScene---------&gt;&apos;</span>, <span class="hljs-string">&apos;&#x79FB;&#x9664;&#x901A;&#x77E5;&apos;</span>);
+            <span class="hljs-keyword">this</span>.subscription.remove();
+    }
+    render() {
+        <span class="hljs-keyword">return</span> (
+            <span class="xml"><span class="hljs-tag">&lt;<span class="hljs-name">View</span> <span class="hljs-attr">style</span>=<span class="hljs-string">{{flex:</span> <span class="hljs-attr">1</span>, <span class="hljs-attr">backgroundColor:</span> &apos;<span class="hljs-attr">white</span>&apos;}}&gt;</span>
+                <span class="hljs-tag">&lt;<span class="hljs-name">Button</span>
+                    <span class="hljs-attr">title</span>=<span class="hljs-string">&apos;3&#x3001;RN Push&#x5230;Native &#x53D1;&#x9001;&#x901A;&#x77E5;&#x9875;&#x9762;&apos;</span>
+                    <span class="hljs-attr">onPress</span>=<span class="hljs-string">{()</span> =&gt;</span> pushNative(RNEmitter)}
+                /&gt;
+                <span class="hljs-tag">&lt;<span class="hljs-name">Text</span> <span class="hljs-attr">style</span>=<span class="hljs-string">{{fontSize:</span> <span class="hljs-attr">20</span>, <span class="hljs-attr">color:</span> &apos;<span class="hljs-attr">red</span>&apos;, <span class="hljs-attr">textAlign:</span> &apos;<span class="hljs-attr">center</span>&apos;,<span class="hljs-attr">marginTop:50</span>}}&gt;</span>{this.state.loginInfo}<span class="hljs-tag">&lt;/<span class="hljs-name">Text</span>&gt;</span>
+            <span class="hljs-tag">&lt;/<span class="hljs-name">View</span>&gt;</span>
+        );
+    }
+}
+</span></code></pre>
+<p>&#x6548;&#x679C;&#x5C55;&#x793A;&#xFF1A;</p>
+<p><img src="https://ws1.sinaimg.cn/large/72ebc0edgy1fyd60aqb8bg208z0idabx.gif" alt="image"></p>
+<h3 id="16-&#x5B8C;&#x6574;demo&#xFF08;&#x5305;&#x542B;ios--android"><a name="16-&#x5B8C;&#x6574;demo&#xFF08;&#x5305;&#x542B;ios--android" class="anchor-navigation-ex-anchor" href="#16-&#x5B8C;&#x6574;demo&#xFF08;&#x5305;&#x542B;ios--android"><i class="fa fa-link" aria-hidden="true"></i></a>1.6 &#x5B8C;&#x6574;Demo&#xFF08;&#x5305;&#x542B;iOS &amp; Android)</h3>
+<p><a href="https://github.com/BulldogX/RN-NativeTest.git" target="_blank">RN-NativeTest</a></p>
+<footer class="page-footer"><span class="copyright">Copyright &#xA9; Kede 2019 all right reserved&#xFF0C;powered by Gitbook</span><span class="footer-modification">&#x4FEE;&#x8BA2;&#x65F6;&#x95F4;&#xFF1A;
+2019-10-16 13:04:39
+</span></footer>
+                                
+                                </section>
+                            
+    </div>
+    <div class="search-results">
+        <div class="has-results">
+            
+            <h1 class="search-results-title"><span class='search-results-count'></span> results matching "<span class='search-query'></span>"</h1>
+            <ul class="search-results-list"></ul>
+            
+        </div>
+        <div class="no-results">
+            
+            <h1 class="search-results-title">No results matching "<span class='search-query'></span>"</h1>
+            
+        </div>
+    </div>
+</div>
+
+                        </div>
+                    </div>
+                
+            </div>
+
+            
+                
+                <a href="ReactNative集成到原生项目.html" class="navigation navigation-prev " aria-label="Previous page: ReactNative集成到原生项目">
+                    <i class="fa fa-angle-left"></i>
+                </a>
+                
+                
+                <a href="ReactNative与Android的交互.html" class="navigation navigation-next " aria-label="Next page: ReactNative与Android的交互">
+                    <i class="fa fa-angle-right"></i>
+                </a>
+                
+            
+        
+    </div>
+
+    <script>
+        var gitbook = gitbook || [];
+        gitbook.push(function() {
+            gitbook.page.hasChanged({"page":{"title":"ReactNative与iOS的交互","level":"3.1.3","depth":2,"next":{"title":"ReactNative与Android的交互","level":"3.1.4","depth":2,"path":"content/ReactNative/ReactNative与Android的交互.md","ref":"./content/ReactNative/ReactNative与Android的交互.md","articles":[]},"previous":{"title":"ReactNative集成到原生项目","level":"3.1.2","depth":2,"path":"content/ReactNative/ReactNative集成到原生项目.md","ref":"./content/ReactNative/ReactNative集成到原生项目.md","articles":[]},"dir":"ltr"},"config":{"plugins":["theme-code@0.0.20","-lunr","-search","search-pro","splitter","tbfed-pagefooter","chapter-fold","code","-copy-code-button","anchor-navigation-ex","expandable-chapters","livereload"],"root":"./","styles":{"website":"styles/website.css"},"pluginsConfig":{"tbfed-pagefooter":{"copyright":"Copyright &copy Kede 2019","modify_label":"修订时间：","modify_format":"YYYY-MM-DD HH:mm:ss"},"chapter-fold":{},"livereload":{},"splitter":{},"search-pro":{},"code":{"copyButtons":true},"theme-code":{"showLevel":false,"styles":{"ebook":"styles/ebook.css","epub":"styles/epub.css","mobi":"styles/mobi.css","pdf":"styles/pdf.css","print":"styles/print.css","website":"styles/website.css"}},"fontsettings":{"theme":"white","family":"sans","size":2},"highlight":{},"anchor-navigation-ex":{"associatedWithSummary":true,"float":{"floatIcon":"fa fa-navicon","level1Icon":"","level2Icon":"","level3Icon":"","showLevelIcon":false},"mode":"float","multipleH1":true,"pageTop":{"level1Icon":"","level2Icon":"","level3Icon":"","showLevelIcon":false},"printLog":false,"showGoTop":true,"showLevel":false},"sharing":{"facebook":true,"twitter":true,"google":false,"weibo":false,"instapaper":false,"vk":false,"all":["facebook","google","twitter","weibo","instapaper"]},"theme-default":{"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"},"showLevel":true},"expandable-chapters":{}},"copyright":"All Rights Reserved","theme":"default","pdf":{"pageNumbers":true,"fontSize":12,"fontFamily":"Arial","paperSize":"a4","chapterMark":"pagebreak","pageBreaksBefore":"/","margin":{"right":62,"left":62,"top":56,"bottom":56}},"structure":{"langs":"LANGS.md","readme":"README.md","glossary":"GLOSSARY.md","summary":"SUMMARY.md"},"variables":{},"title":"BulldogX's Note","language":"zh-hans","gitbook":"*"},"file":{"path":"content/ReactNative/ReactNative与iOS的交互.md","mtime":"2019-10-16T05:04:39.264Z","type":"markdown"},"gitbook":{"version":"3.2.3","time":"2019-12-13T07:32:48.746Z"},"basePath":"../..","book":{"language":""}});
+        });
+    </script>
+</div>
+
+
+        
+    <script src="../../gitbook/gitbook.js"></script>
+    <script src="../../gitbook/theme.js"></script>
+    
+        
+        <script src="../../gitbook/gitbook-plugin-search-pro/jquery.mark.min.js"></script>
+        
+    
+        
+        <script src="../../gitbook/gitbook-plugin-search-pro/search.js"></script>
+        
+    
+        
+        <script src="../../gitbook/gitbook-plugin-splitter/splitter.js"></script>
+        
+    
+        
+        <script src="../../gitbook/gitbook-plugin-chapter-fold/chapter-fold.js"></script>
+        
+    
+        
+        <script src="../../gitbook/gitbook-plugin-code/plugin.js"></script>
+        
+    
+        
+        <script src="../../gitbook/gitbook-plugin-expandable-chapters/expandable-chapters.js"></script>
+        
+    
+        
+        <script src="../../gitbook/gitbook-plugin-livereload/plugin.js"></script>
+        
+    
+        
+        <script src="../../gitbook/gitbook-plugin-sharing/buttons.js"></script>
+        
+    
+        
+        <script src="../../gitbook/gitbook-plugin-fontsettings/fontsettings.js"></script>
+        
+    
+
+    </body>
+</html>
+
